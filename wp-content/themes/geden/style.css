@@ -816,6 +816,11 @@ section.section.problematiques {
 .pr-hero__inner {
   padding: 24px 0 60px 24px;
   color: #fff;
+  position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(11, 18, 32, 0.55), rgba(11, 18, 32, 0.55)), var(--img) center / cover no-repeat;
+    filter: saturate(1.05);
+    z-index: -1;
 }
 
 .pr-hero__tag {
@@ -872,6 +877,11 @@ section.section.problematiques {
 .services-hero__inner {
   padding: 24px 0 60px 24px;
   color: #fff;
+  position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(11, 18, 32, 0.55), rgba(11, 18, 32, 0.55)), var(--img) center / cover no-repeat;
+    filter: saturate(1.05);
+    z-index: -1;
 }
 
 .services-hero__tag {
@@ -1275,6 +1285,11 @@ section.section.problematiques {
 .pubs-hero__inner {
   padding: 24px 0 60px 24px;
   color: #fff;
+  position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(11, 18, 32, 0.55), rgba(11, 18, 32, 0.55)), var(--img) center / cover no-repeat;
+    filter: saturate(1.05);
+    z-index: -1;
 }
 
 .pubs-hero__tag {
