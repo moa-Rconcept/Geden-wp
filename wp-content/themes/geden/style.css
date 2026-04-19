@@ -843,6 +843,7 @@ section.section.problematiques {
   margin: 0.5rem 0 0.25rem;
   font-size: clamp(1.5rem, 2vw + 1rem, 2.25rem);
   letter-spacing: -0.2px;
+  color: #fff;
 }
 
 .pr-hero__lede {
