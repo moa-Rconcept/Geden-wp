@@ -99,7 +99,7 @@ $hero_classes = [
     $grid_class = $section_key === 'permet' ? 'en-grid services-cards' : 'en-grid enjeux-cards';
     ?>
     <section class="section <?php echo esc_attr($section['class']); ?>">
-      <article class="<?php echo esc_attr($section['hero_class']); ?>" style="--img:url('<?php echo esc_url($image_url); ?>')">
+      <article class="<?php echo esc_attr($section['hero_class']); ?>" style="background-img:url('<?php echo esc_url($image_url); ?>')">
         <div class="<?php echo esc_attr($section['hero_bg_class']); ?>"></div>
         <div class="<?php echo esc_attr($section['hero_inner_class']); ?>">
           <span class="<?php echo esc_attr($section['hero_tag_class']); ?>"><?php echo esc_html($tag); ?></span>
