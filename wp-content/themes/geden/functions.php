@@ -25,6 +25,16 @@ function geden_theme_setup(): void
 }
 add_action('after_setup_theme', 'geden_theme_setup');
 
+function geden_disable_block_editor_for_custom_content(bool $use_block_editor, string $post_type): bool
+{
+    if (in_array($post_type, ['geden_reference', 'geden_sponsor'], true)) {
+        return false;
+    }
+
+    return $use_block_editor;
+}
+add_filter('use_block_editor_for_post_type', 'geden_disable_block_editor_for_custom_content', 10, 2);
+
 function geden_enqueue_assets(): void
 {
     wp_enqueue_style('geden-style', get_template_directory_uri() . '/style.css', [], wp_get_theme()->get('Version'));
@@ -286,7 +296,7 @@ function geden_save_meta_boxes(int $post_id): void
         update_post_meta($post_id, '_geden_sponsor_website', $website);
     }
 
-     if (isset($_POST['geden_references_page_options_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['geden_references_page_options_nonce'])), 'geden_save_references_page_options')) {
+    if (isset($_POST['geden_references_page_options_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['geden_references_page_options_nonce'])), 'geden_save_references_page_options')) {
         update_post_meta($post_id, '_geden_references_banner_image_id', absint(wp_unslash($_POST['geden_references_banner_image_id'] ?? 0)));
         update_post_meta($post_id, '_geden_references_hero_image_id', absint(wp_unslash($_POST['geden_references_hero_image_id'] ?? 0)));
         update_post_meta($post_id, '_geden_references_hero_title', sanitize_text_field((string) wp_unslash($_POST['geden_references_hero_title'] ?? '')));
