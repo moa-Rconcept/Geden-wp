@@ -51,6 +51,21 @@ function geden_enqueue_assets(): void
 }
 add_action('wp_enqueue_scripts', 'geden_enqueue_assets');
 
+function geden_admin_enqueue_media_for_references(string $hook): void
+{
+    if (!in_array($hook, ['post.php', 'post-new.php'], true)) {
+        return;
+    }
+
+    $screen = get_current_screen();
+    if (!$screen || $screen->post_type !== 'geden_reference') {
+        return;
+    }
+
+    wp_enqueue_media();
+}
+add_action('admin_enqueue_scripts', 'geden_admin_enqueue_media_for_references');
+
 function geden_register_content_types(): void
 {
     register_post_type('geden_reference', [
@@ -169,17 +184,10 @@ function geden_reference_meta_box(WP_Post $post): void
     $needs = (string) get_post_meta($post->ID, '_geden_reference_needs', true);
     $services = (string) get_post_meta($post->ID, '_geden_reference_services', true);
     $authors = (string) get_post_meta($post->ID, '_geden_reference_authors', true);
-    $deliverable = (string) get_post_meta($post->ID, '_geden_reference_deliverable', true);
-    $sponsor_ids = (string) get_post_meta($post->ID, '_geden_reference_sponsor_ids', true);
-    $selected_ids = array_filter(array_map('intval', explode(',', $sponsor_ids)));
-
-    $sponsors = get_posts([
-        'post_type' => 'geden_sponsor',
-        'post_status' => 'publish',
-        'numberposts' => -1,
-        'orderby' => 'title',
-        'order' => 'ASC',
-    ]);
+   $saved_logos = geden_get_reference_sponsor_logos($post->ID);
+    if (empty($saved_logos)) {
+        $saved_logos = [['name' => '', 'url' => '', 'image_id' => 0]];
+    }
     ?>
     <p>
       <strong><?php esc_html_e('Astuce catégorie', 'geden'); ?></strong>:
@@ -206,13 +214,44 @@ function geden_reference_meta_box(WP_Post $post): void
     <p><label for="geden_reference_deliverable"><strong><?php esc_html_e('Livrable (productions)', 'geden'); ?></strong></label><br>
       <input type="text" id="geden_reference_deliverable" name="geden_reference_deliverable" value="<?php echo esc_attr($deliverable); ?>" style="width: 100%;" />
     </p>
-    <p><label for="geden_reference_sponsor_ids"><strong><?php esc_html_e('Sponsors (logos)', 'geden'); ?></strong></label><br>
-      <select id="geden_reference_sponsor_ids" name="geden_reference_sponsor_ids[]" multiple style="width: 100%; min-height: 120px; max-width: 520px;">
-        <?php foreach ($sponsors as $sponsor) : ?>
-          <option value="<?php echo esc_attr((string) $sponsor->ID); ?>" <?php selected(in_array((int) $sponsor->ID, $selected_ids, true)); ?>><?php echo esc_html($sponsor->post_title); ?></option>
-        <?php endforeach; ?>
-      </select>
-    </p>
+    <div>
+      <label><strong><?php esc_html_e('Sponsors (logos)', 'geden'); ?></strong></label>
+      <p style="margin-top:6px;"><?php esc_html_e('Ajoutez un nom (title), un lien et une image pour chaque logo.', 'geden'); ?></p>
+      <div id="geden-sponsor-rows">
+        <?php foreach ($saved_logos as $logo) : ?>
+          <div class="geden-sponsor-row" style="display:grid;grid-template-columns:1fr 1fr auto auto;gap:8px;align-items:center;margin-bottom:8px;">
+            <input type="text" name="geden_reference_sponsors_name[]" value="<?php echo esc_attr((string) ($logo['name'] ?? '')); ?>" placeholder="<?php esc_attr_e('Nom du sponsor', 'geden'); ?>" />
+            <input type="url" name="geden_reference_sponsors_url[]" value="<?php echo esc_url((string) ($logo['url'] ?? '')); ?>" placeholder="<?php esc_attr_e('https://...', 'geden'); ?>" />
+            <input type="hidden" class="geden-sponsor-image-id" name="geden_reference_sponsors_image_id[]" value="<?php echo esc_attr((string) ((int) ($logo['image_id'] ?? 0))); ?>" />
+            <button type="button" class="button geden-pick-image"><?php esc_html_e('Choisir image', 'geden'); ?></button>
+            <button type="button" class="button-link-delete geden-remove-row"><?php esc_html_e('Supprimer', 'geden'); ?></button>
+          </div>
+          <?php endforeach; ?>
+          </div>
+      <button type="button" class="button" id="geden-add-sponsor-row"><?php esc_html_e('Ajouter un logo', 'geden'); ?></button>
+    </div>
+    <script>
+      (function($){
+        const rows = $('#geden-sponsor-rows');
+        $('#geden-add-sponsor-row').on('click', function(){
+          rows.append('<div class="geden-sponsor-row" style="display:grid;grid-template-columns:1fr 1fr auto auto;gap:8px;align-items:center;margin-bottom:8px;"><input type="text" name="geden_reference_sponsors_name[]" placeholder="<?php echo esc_js(__('Nom du sponsor', 'geden')); ?>" /><input type="url" name="geden_reference_sponsors_url[]" placeholder="https://..." /><input type="hidden" class="geden-sponsor-image-id" name="geden_reference_sponsors_image_id[]" value="0" /><button type="button" class="button geden-pick-image"><?php echo esc_js(__('Choisir image', 'geden')); ?></button><button type="button" class="button-link-delete geden-remove-row"><?php echo esc_js(__('Supprimer', 'geden')); ?></button></div>');
+        });
+        rows.on('click', '.geden-remove-row', function(){
+          $(this).closest('.geden-sponsor-row').remove();
+        });
+        rows.on('click', '.geden-pick-image', function(){
+          const button = $(this);
+          const target = button.closest('.geden-sponsor-row').find('.geden-sponsor-image-id');
+          const frame = wp.media({ title: '<?php echo esc_js(__('Choisir un logo', 'geden')); ?>', multiple: false, library: { type: 'image' } });
+          frame.on('select', function(){
+            const image = frame.state().get('selection').first().toJSON();
+            target.val(image.id || 0);
+            button.text(image.filename ? image.filename : '<?php echo esc_js(__('Image sélectionnée', 'geden')); ?>');
+          });
+          frame.open();
+        });
+      })(jQuery);
+    </script>
     <?php
 }
 
@@ -265,7 +304,6 @@ function geden_references_page_options_meta_box(WP_Post $post): void
     </p>
     <?php
 }
-
 function geden_save_meta_boxes(int $post_id): void
 {
     if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
@@ -276,11 +314,6 @@ function geden_save_meta_boxes(int $post_id): void
     }
 
     if (isset($_POST['geden_reference_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['geden_reference_nonce'])), 'geden_save_reference_meta')) {
-        $sponsor_ids = [];
-        if (isset($_POST['geden_reference_sponsor_ids']) && is_array($_POST['geden_reference_sponsor_ids'])) {
-            $sponsor_ids = array_filter(array_map('intval', wp_unslash($_POST['geden_reference_sponsor_ids'])));
-        }
-
         update_post_meta($post_id, '_geden_reference_year', sanitize_text_field((string) wp_unslash($_POST['geden_reference_year'] ?? '')));
         update_post_meta($post_id, '_geden_reference_client', sanitize_text_field((string) wp_unslash($_POST['geden_reference_client'] ?? '')));
         update_post_meta($post_id, '_geden_reference_link', esc_url_raw((string) wp_unslash($_POST['geden_reference_link'] ?? '')));
@@ -288,8 +321,21 @@ function geden_save_meta_boxes(int $post_id): void
         update_post_meta($post_id, '_geden_reference_services', sanitize_textarea_field((string) wp_unslash($_POST['geden_reference_services'] ?? '')));
         update_post_meta($post_id, '_geden_reference_authors', sanitize_text_field((string) wp_unslash($_POST['geden_reference_authors'] ?? '')));
         update_post_meta($post_id, '_geden_reference_deliverable', sanitize_text_field((string) wp_unslash($_POST['geden_reference_deliverable'] ?? '')));
-        update_post_meta($post_id, '_geden_reference_sponsor_ids', implode(',', $sponsor_ids));
-    }
+        $logo_names = isset($_POST['geden_reference_sponsors_name']) ? (array) wp_unslash($_POST['geden_reference_sponsors_name']) : [];
+        $logo_urls = isset($_POST['geden_reference_sponsors_url']) ? (array) wp_unslash($_POST['geden_reference_sponsors_url']) : [];
+        $logo_image_ids = isset($_POST['geden_reference_sponsors_image_id']) ? (array) wp_unslash($_POST['geden_reference_sponsors_image_id']) : [];
+        $max = max(count($logo_names), count($logo_urls), count($logo_image_ids));
+        $logos = [];
+        for ($i = 0; $i < $max; $i++) {
+            $name = sanitize_text_field((string) ($logo_names[$i] ?? ''));
+            $url = esc_url_raw((string) ($logo_urls[$i] ?? ''));
+            $image_id = absint($logo_image_ids[$i] ?? 0);
+            if ($name === '' && $url === '' && $image_id === 0) {
+                continue;
+            }
+            $logos[] = ['name' => $name, 'url' => $url, 'image_id' => $image_id];
+        }
+        update_post_meta($post_id, '_geden_reference_sponsor_logos', wp_json_encode($logos));    }
 
     if (isset($_POST['geden_sponsor_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['geden_sponsor_nonce'])), 'geden_save_sponsor_meta')) {
         $website = isset($_POST['geden_sponsor_website']) ? esc_url_raw(wp_unslash($_POST['geden_sponsor_website'])) : '';
@@ -332,6 +378,40 @@ function geden_get_reference_sponsors(int $post_id): array
         'numberposts' => -1,
     ]);
 }
+
+function geden_get_reference_sponsor_logos(int $post_id): array
+{
+    $raw = (string) get_post_meta($post_id, '_geden_reference_sponsor_logos', true);
+    $decoded = $raw !== '' ? json_decode($raw, true) : [];
+    if (is_array($decoded) && !empty($decoded)) {
+        return array_values(array_filter(array_map(static function ($row) {
+            if (!is_array($row)) {
+                return null;
+            }
+            $name = sanitize_text_field((string) ($row['name'] ?? ''));
+            $url = esc_url_raw((string) ($row['url'] ?? ''));
+            $image_id = absint($row['image_id'] ?? 0);
+            if ($name === '' && $url === '' && $image_id === 0) {
+                return null;
+            }
+            return ['name' => $name, 'url' => $url, 'image_id' => $image_id];
+        }, $decoded)));
+    }
+
+    $legacy = geden_get_reference_sponsors($post_id);
+    if (empty($legacy)) {
+        return [];
+    }
+
+    return array_map(static function (WP_Post $sponsor) {
+        return [
+            'name' => $sponsor->post_title,
+            'url' => (string) get_post_meta($sponsor->ID, '_geden_sponsor_website', true),
+            'image_id' => get_post_thumbnail_id($sponsor->ID),
+        ];
+    }, $legacy);
+}
+
 
 function geden_seed_default_terms(): void
 {

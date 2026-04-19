@@ -1298,6 +1298,17 @@ section.section.problematiques {
   color: #e6eefc;
 }
 
+.pubs-hero__cta {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 0.55rem 0.8rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+  font-weight: 600;
+}
+
 /* ==========================================================================
    11) PAGE: CONTACT (inchangé)
    ========================================================================== */

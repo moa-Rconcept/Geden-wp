@@ -73,8 +73,8 @@ if ($hero_subtitle === '') {
       $year = (string) get_post_meta($post_id, '_geden_reference_year', true);
       $needs = geden_get_reference_bullets('_geden_reference_needs', $post_id);
       $services = geden_get_reference_bullets('_geden_reference_services', $post_id);
-      $sponsors = geden_get_reference_sponsors($post_id);
-      ?>
+      $sponsors = geden_get_reference_sponsor_logos($post_id);
+    ?>
       <article class="ref-card">
         <aside class="ref-meta">
           <?php if ($year !== '') : ?><div class="ref-year"><?php echo esc_html($year); ?></div><?php endif; ?>
@@ -83,13 +83,17 @@ if ($hero_subtitle === '') {
             <div class="logo-ref">
               <?php foreach ($sponsors as $sponsor) : ?>
                 <?php
-                $logo = get_the_post_thumbnail($sponsor->ID, 'medium', ['alt' => $sponsor->post_title]);
-                $sponsor_url = (string) get_post_meta($sponsor->ID, '_geden_sponsor_website', true);
+                 $name = (string) ($sponsor['name'] ?? '');
+                $url = (string) ($sponsor['url'] ?? '');
+                $image_id = (int) ($sponsor['image_id'] ?? 0);
+                $logo = $image_id > 0 ? wp_get_attachment_image($image_id, 'medium', false, ['alt' => $name, 'title' => $name]) : '';
                 ?>
-                <?php if (!empty($sponsor_url)) : ?>
-                  <a href="<?php echo esc_url($sponsor_url); ?>" target="_blank" rel="noopener"><?php echo $logo; ?></a>
-                <?php else : ?>
-                  <?php echo $logo; ?>
+                <?php if ($logo !== '') : ?>
+                  <?php if ($url !== '') : ?>
+                    <a href="<?php echo esc_url($url); ?>" target="_blank" rel="noopener" title="<?php echo esc_attr($name); ?>"><?php echo $logo; ?></a>
+                  <?php else : ?>
+                    <span title="<?php echo esc_attr($name); ?>"><?php echo $logo; ?></span>
+                  <?php endif; ?>
                 <?php endif; ?>
               <?php endforeach; ?>
             </div>
@@ -150,7 +154,7 @@ if ($hero_subtitle === '') {
       $year = (string) get_post_meta($post_id, '_geden_reference_year', true);
       $needs = geden_get_reference_bullets('_geden_reference_needs', $post_id);
       $services = geden_get_reference_bullets('_geden_reference_services', $post_id);
-      $sponsors = geden_get_reference_sponsors($post_id);
+      $sponsors = geden_get_reference_sponsor_logos($post_id);
       ?>
       <article class="ref-card">
         <aside class="ref-meta">
@@ -160,13 +164,17 @@ if ($hero_subtitle === '') {
             <div class="logo-ref">
               <?php foreach ($sponsors as $sponsor) : ?>
                 <?php
-                $logo = get_the_post_thumbnail($sponsor->ID, 'medium', ['alt' => $sponsor->post_title]);
-                $sponsor_url = (string) get_post_meta($sponsor->ID, '_geden_sponsor_website', true);
+                $name = (string) ($sponsor['name'] ?? '');
+                $url = (string) ($sponsor['url'] ?? '');
+                $image_id = (int) ($sponsor['image_id'] ?? 0);
+                $logo = $image_id > 0 ? wp_get_attachment_image($image_id, 'medium', false, ['alt' => $name, 'title' => $name]) : '';
                 ?>
-                <?php if (!empty($sponsor_url)) : ?>
-                  <a href="<?php echo esc_url($sponsor_url); ?>" target="_blank" rel="noopener"><?php echo $logo; ?></a>
-                <?php else : ?>
-                  <?php echo $logo; ?>
+                <?php if ($logo !== '') : ?>
+                  <?php if ($url !== '') : ?>
+                    <a href="<?php echo esc_url($url); ?>" target="_blank" rel="noopener" title="<?php echo esc_attr($name); ?>"><?php echo $logo; ?></a>
+                  <?php else : ?>
+                    <span title="<?php echo esc_attr($name); ?>"><?php echo $logo; ?></span>
+                  <?php endif; ?>
                 <?php endif; ?>
               <?php endforeach; ?>
             </div>
@@ -205,6 +213,7 @@ if ($hero_subtitle === '') {
   <?php if ($banner_image_url !== '') : ?>
     <img class="fishingIMG" src="<?php echo esc_url($banner_image_url); ?>" alt="Bandeau Références" loading="lazy">
   <?php endif; ?>
+  
   <section id="productions" class="section">
     <article class="pubs-hero" style="--img:url('<?php echo esc_url($hero_image_url); ?>')">
       <div class="pubs-hero__bg"></div>
