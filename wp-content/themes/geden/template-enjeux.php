@@ -13,48 +13,43 @@ get_header();
 $page_id = get_queried_object_id();
 $subtitle = has_excerpt($page_id) ? get_the_excerpt($page_id) : '';
 
-$sections = [
-    'enjeux' => [
-        'taxonomy_slug' => 'blocs-enjeux',
-        'class' => 'enjeux',
+$page_id = get_queried_object_id();
+$subtitle = has_excerpt($page_id) ? get_the_excerpt($page_id) : '';
+
+$terms = get_terms([
+    'taxonomy' => 'enjeu_category',
+    'hide_empty' => false,
+    'orderby' => 'name',
+    'order' => 'ASC',
+]);
+
+$hero_classes = [
+    'blocs-enjeux' => [
+        'section_class' => 'enjeux',
         'hero_class' => 'enjeux-hero',
-        'hero_bg_class' => 'enjeux-hero__bg',
-        'hero_inner_class' => 'enjeux-hero__inner',
-        'hero_tag_class' => 'enjeux-hero__tag',
-        'hero_title_class' => 'enjeux-hero__title',
-        'hero_text_class' => 'enjeux-hero__lede',
-        'default_img' => get_template_directory_uri() . '/img/arbres.jpg',
-        'default_tag' => 'Enjeux',
-        'default_title' => 'Comprendre, quantifier et anticiper les usages',
-        'default_text' => 'Les activités humaines dans les espaces naturels sont nombreuses, diversifiées et en augmentation.',
+        'bg_class' => 'enjeux-hero__bg',
+        'inner_class' => 'enjeux-hero__inner',
+        'tag_class' => 'enjeux-hero__tag',
+        'title_class' => 'enjeux-hero__title',
+        'text_class' => 'enjeux-hero__lede',
     ],
-    'permet' => [
-        'taxonomy_slug' => 'blocs-permet',
-        'class' => 'permet',
+    'blocs-permet' => [
+        'section_class' => 'permet',
         'hero_class' => 'services-hero services-hero--small',
-        'hero_bg_class' => 'services-hero__bg',
-        'hero_inner_class' => 'services-hero__inner',
-        'hero_tag_class' => 'services-hero__tag',
-        'hero_title_class' => 'services-hero__title',
-        'hero_text_class' => 'services-hero__lede',
-        'default_img' => get_template_directory_uri() . '/img/water-7902554_1280.jpg',
-        'default_tag' => 'Ce que cela permet',
-        'default_title' => 'Intérêt pour la gestion de vos sites',
-        'default_text' => "Faire appel à Geden, c'est vous permettre de mieux :",
+        'bg_class' => 'services-hero__bg',
+        'inner_class' => 'services-hero__inner',
+        'tag_class' => 'services-hero__tag',
+        'title_class' => 'services-hero__title',
+        'text_class' => 'services-hero__lede',
     ],
-    'problematiques' => [
-        'taxonomy_slug' => 'blocs-problematiques',
-        'class' => 'problematiques',
+    'blocs-problematiques' => [
+        'section_class' => 'problematiques',
         'hero_class' => 'pr-hero',
-        'hero_bg_class' => 'pr-hero__bg',
-        'hero_inner_class' => 'pr-hero__inner',
-        'hero_tag_class' => 'pr-hero__tag',
-        'hero_title_class' => 'pr-hero__title',
-        'hero_text_class' => 'pr-hero__lede',
-        'default_img' => get_template_directory_uri() . '/img/reef-7886750_1280.jpg',
-        'default_tag' => 'Problématiques',
-        'default_title' => 'Les questions à éclairer pour agir',
-        'default_text' => "Répondre à ces questions, c'est permettre d’aborder de manière efficace de nombreux enjeux concrets.",
+        'bg_class' => 'pr-hero__bg',
+        'inner_class' => 'pr-hero__inner',
+        'tag_class' => 'pr-hero__tag',
+        'title_class' => 'pr-hero__title',
+        'text_class' => 'pr-hero__lede',
     ],
 ];
 
