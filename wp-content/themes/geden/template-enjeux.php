@@ -13,9 +13,6 @@ get_header();
 $page_id = get_queried_object_id();
 $subtitle = has_excerpt($page_id) ? get_the_excerpt($page_id) : '';
 
-$page_id = get_queried_object_id();
-$subtitle = has_excerpt($page_id) ? get_the_excerpt($page_id) : '';
-
 $terms = get_terms([
     'taxonomy' => 'enjeu_category',
     'hide_empty' => false,
@@ -52,7 +49,6 @@ $hero_classes = [
         'text_class' => 'pr-hero__lede',
     ],
 ];
-
 ?>
 
 <section class="page-hero">
@@ -65,12 +61,12 @@ $hero_classes = [
 </section>
 
 <main class="container">
-  <?php foreach ($sections as $section_key => $section) : ?>
+  <?php foreach ($terms as $term) : ?>
     <?php
-    $term = get_term_by('slug', $section['taxonomy_slug'], 'enjeu_category');
     if (!$term instanceof WP_Term) {
         continue;
     }
+    $style = $hero_classes[$term->slug] ?? $hero_classes['blocs-enjeux'];
     $tag = (string) get_term_meta($term->term_id, '_geden_enjeu_category_tag', true);
     $title = (string) get_term_meta($term->term_id, '_geden_enjeu_category_title', true);
     $text = (string) get_term_meta($term->term_id, '_geden_enjeu_category_subtitle', true);
@@ -80,10 +76,8 @@ $hero_classes = [
         // Compatibilité ancienne saisie URL manuelle.
         $image_url = (string) get_term_meta($term->term_id, '_geden_enjeu_category_image_url', true);
     }
-    $image_url = $image_url !== '' ? $image_url : $section['default_img'];
-    $tag = $tag !== '' ? $tag : $section['default_tag'];
-    $title = $title !== '' ? $title : $section['default_title'];
-    $text = $text !== '' ? $text : $section['default_text'];
+    $tag = $tag !== '' ? $tag : $term->name;
+    $title = $title !== '' ? $title : $term->name;
 
     $items = new WP_Query([
         'post_type' => 'geden_enjeu',
@@ -96,21 +90,21 @@ $hero_classes = [
         'orderby' => ['menu_order' => 'ASC', 'date' => 'ASC'],
     ]);
 
-    $grid_class = $section_key === 'permet' ? 'en-grid services-cards' : 'en-grid enjeux-cards';
+    $grid_class = $term->slug === 'blocs-permet' ? 'en-grid services-cards' : 'en-grid enjeux-cards';
     ?>
-    <section class="section <?php echo esc_attr($section['class']); ?>">
-      <article class="<?php echo esc_attr($section['hero_class']); ?>" style="background-img:url('<?php echo esc_url($image_url); ?>')">
-        <div class="<?php echo esc_attr($section['hero_bg_class']); ?>"></div>
-        <div class="<?php echo esc_attr($section['hero_inner_class']); ?>">
-          <span class="<?php echo esc_attr($section['hero_tag_class']); ?>"><?php echo esc_html($tag); ?></span>
-          <h2 class="<?php echo esc_attr($section['hero_title_class']); ?>"><?php echo esc_html($title); ?></h2>
-          <p class="<?php echo esc_attr($section['hero_text_class']); ?>"><?php echo esc_html($text); ?></p>
+    <section class="section <?php echo esc_attr($style['section_class']); ?>">
+      <article class="<?php echo esc_attr($style['hero_class']); ?>"<?php echo $image_url !== '' ? " style=\"background-image:url('" . esc_url($image_url) . "')\"" : ''; ?>>
+        <div class="<?php echo esc_attr($style['bg_class']); ?>"></div>
+        <div class="<?php echo esc_attr($style['inner_class']); ?>">
+          <span class="<?php echo esc_attr($style['tag_class']); ?>"><?php echo esc_html($tag); ?></span>
+          <h2 class="<?php echo esc_attr($style['title_class']); ?>"><?php echo esc_html($title); ?></h2>
+          <?php if ($text !== '') : ?><p class="<?php echo esc_attr($style['text_class']); ?>"><?php echo esc_html($text); ?></p><?php endif; ?>
         </div>
       </article>
 
       <div class="<?php echo esc_attr($grid_class); ?>">
         <?php if (!$items->have_posts()) : ?>
-          <p class="ref-empty">Aucun bloc trouvé pour la catégorie <code><?php echo esc_html($section['taxonomy_slug']); ?></code>.</p>
+          <p class="ref-empty">Aucun bloc trouvé pour la catégorie <code><?php echo esc_html($term->slug); ?></code>.</p>
         <?php endif; ?>
 
         <?php while ($items->have_posts()) : $items->the_post(); ?>
@@ -122,7 +116,7 @@ $hero_classes = [
           $short_text = (string) get_post_meta($post_id, '_geden_enjeu_text', true);
           $lines = geden_get_enjeu_lines($post_id);
           ?>
-          <article class="en-item <?php echo $section_key === 'permet' ? 'services-card' : ''; ?>">
+          <article class="en-item <?php echo $term->slug === 'blocs-permet' ? 'services-card' : ''; ?>">
             <span class="icon-badge <?php echo esc_attr($badge); ?>" aria-hidden="true">
               <span class="svg"><?php echo wp_kses(geden_get_enjeu_icon_svg($icon), ['svg' => ['viewBox' => true, 'fill' => true], 'path' => ['d' => true, 'stroke' => true, 'stroke-width' => true, 'stroke-linecap' => true, 'stroke-linejoin' => true], 'circle' => ['cx' => true, 'cy' => true, 'r' => true], 'rect' => ['x' => true, 'y' => true, 'width' => true, 'height' => true, 'rx' => true]]); ?></span>
             </span>
@@ -146,5 +140,6 @@ $hero_classes = [
     </section>
   <?php endforeach; ?>
 </main>
+
 <?php
 get_footer();
