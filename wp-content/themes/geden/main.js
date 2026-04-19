@@ -1,37 +1,40 @@
 
- // Année automatique dans le footer
- $('#year').text(new Date().getFullYear());
- 
- // Menu mobile (toggle + classe active)
- const $toggle = $('#menuToggle');
- const $menu = $('#menu');
- 
- $toggle.on('click', function () {
-   const $btn = $(this);
-   const isOpen = $btn.attr('aria-expanded') === 'true';
- 
- // aria
-   $btn.attr('aria-expanded', String(!isOpen));
-   $menu.toggleClass('active', !isOpen);
- 
-   // affichage
-   if (isOpen) {
-     $menu.hide();
-   } else {
-     $menu
-       .css({
-         display: 'flex',
-         flexDirection: 'column',
-         gap: '12px',
-         padding: '12px 0'
-       })
-       .show();
-   }
- });
- 
+
 // --- Sort "Références" cards by year (desc) ---
 // Works for single years (e.g., "2019") and ranges (e.g., "2024 – 2026")
 (function () {
+
+  // Année automatique dans le footer
+  $('#year').text(new Date().getFullYear());
+  
+  // Menu mobile (toggle + classe active)
+  const $toggle = $('#menuToggle');
+  const $menu = $('#menu');
+  
+  $toggle.on('click', function () {
+    const $btn = $(this);
+    const isOpen = $btn.attr('aria-expanded') === 'true';
+  
+  // aria
+    $btn.attr('aria-expanded', String(!isOpen));
+    $menu.toggleClass('active', !isOpen);
+  
+    // affichage
+    if (isOpen) {
+      $menu.hide();
+    } else {
+      $menu
+        .css({
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '12px',
+          padding: '12px 0'
+        })
+        .show();
+    }
+  });
+ 
+
   function sortCardsIn(sectionId) {
     var $section = $('#' + sectionId);
     if (!$section.length) return;
