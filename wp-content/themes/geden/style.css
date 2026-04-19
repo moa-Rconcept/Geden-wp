@@ -666,6 +666,7 @@ main.container > .section .bullets {
   overflow: clip;
   margin: 0 0 24px; /* <-- correction */
   border-radius: 18px 18px 0 0;
+  height: 270px;
 }
 
 .enjeux-hero__bg {
@@ -682,6 +683,11 @@ main.container > .section .bullets {
 .enjeux-hero__inner {
   padding: 24px 0 60px 24px;
   color: #fff;
+  position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(11, 18, 32, 0.55), rgba(11, 18, 32, 0.55)), var(--img) center / cover no-repeat;
+    filter: saturate(1.05);
+    z-index: -1;
 }
 
 .enjeux-hero__tag {
