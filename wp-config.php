@@ -20,19 +20,24 @@
 
 // ** Database settings - You can get this info from your web host ** //
 /** The name of the database for WordPress */
-define( 'DB_NAME', 'prograirevelo' );
+define( 'DB_NAME', 'prograirevelo' );
+
 
 /** Database username */
-define( 'DB_USER', 'prograirevelo' );
+define( 'DB_USER', 'prograirevelo' );
+
 
 /** Database password */
-define( 'DB_PASSWORD', 'Eernest13' );
+define( 'DB_PASSWORD', 'Eernest13' );
+
 
 /** Database hostname */
-define( 'DB_HOST', 'prograirevelo.mysql.db' );
+define( 'DB_HOST', 'prograirevelo.mysql.db' );
+
 
 /** Database charset to use in creating database tables. */
-define( 'DB_CHARSET', 'utf8mb4' );
+define( 'DB_CHARSET', 'utf8mb4' );
+
 
 /** The database collate type. Don't change this if in doubt. */
 define( 'DB_COLLATE', '' );
@@ -48,14 +53,22 @@ define( 'DB_COLLATE', '' );
  *
  * @since 2.6.0
  */
-define( 'AUTH_KEY',         '{MeFF?1d,O|2GwG/{Q/$w/ZI$[1nt.d$#6.~K7B<M3G?]FKp#73GgCJH$08lny!z' );
-define( 'SECURE_AUTH_KEY',  'qcg<g-K_a=P!q;9:KZaZLLO8M@b;dVw0K!0!*$wAAbFd`3vJpP(c503TI(<1RJEY' );
-define( 'LOGGED_IN_KEY',    'v&e+CPW7cip.Rzx((@;OScZt1BL QIR;+%Fnv*9elQvHWym T*1LWv|}pn|SRdsP' );
-define( 'NONCE_KEY',        'W1&`AM%.At!IgxkB@Vz vl+B]p}1A{kB>m7ELgWmK)||KWh5X$4,[Ucm!g<SG`$A' );
-define( 'AUTH_SALT',        'MU6F`Pm_uD/@F#um7!zy*>Yw3>Tb0^;[Zm|+Rw2w$Qy1WE~BhCMA^l_#6?NsIM+P' );
-define( 'SECURE_AUTH_SALT', 'tP7|gZLqws3=I_u+.o/{s@;gsqw?ko84D!m%T]9@fGl`{9%J1B[h)Pl<(DigP-2k' );
-define( 'LOGGED_IN_SALT',   'kUf|9LlF:c~rycDWsXT@,3r<E0G1TvY#s]Ek{MWmLZx0z[a~#Qd$CoFMpPd,Tzra' );
-define( 'NONCE_SALT',       'u+WQ#&DUczdnhe|0Ngp)qdr^l#lU5v)[/Av.wziKqyr,@?(UGS o/<`OxG`G<+Zz' );
+define( 'AUTH_KEY',         '{MeFF?1d,O|2GwG/{Q/$w/ZI$[1nt.d$#6.~K7B<M3G?]FKp#73GgCJH$08lny!z' );
+
+define( 'SECURE_AUTH_KEY',  'qcg<g-K_a=P!q;9:KZaZLLO8M@b;dVw0K!0!*$wAAbFd`3vJpP(c503TI(<1RJEY' );
+
+define( 'LOGGED_IN_KEY',    'v&e+CPW7cip.Rzx((@;OScZt1BL QIR;+%Fnv*9elQvHWym T*1LWv|}pn|SRdsP' );
+
+define( 'NONCE_KEY',        'W1&`AM%.At!IgxkB@Vz vl+B]p}1A{kB>m7ELgWmK)||KWh5X$4,[Ucm!g<SG`$A' );
+
+define( 'AUTH_SALT',        'MU6F`Pm_uD/@F#um7!zy*>Yw3>Tb0^;[Zm|+Rw2w$Qy1WE~BhCMA^l_#6?NsIM+P' );
+
+define( 'SECURE_AUTH_SALT', 'tP7|gZLqws3=I_u+.o/{s@;gsqw?ko84D!m%T]9@fGl`{9%J1B[h)Pl<(DigP-2k' );
+
+define( 'LOGGED_IN_SALT',   'kUf|9LlF:c~rycDWsXT@,3r<E0G1TvY#s]Ek{MWmLZx0z[a~#Qd$CoFMpPd,Tzra' );
+
+define( 'NONCE_SALT',       'u+WQ#&DUczdnhe|0Ngp)qdr^l#lU5v)[/Av.wziKqyr,@?(UGS o/<`OxG`G<+Zz' );
+
 
 /**#@-*/
 
@@ -71,7 +84,8 @@ define( 'NONCE_SALT',       'u+WQ#&DUczdnhe|0Ngp)qdr^l#lU5v)[/Av.wziKqyr,@?(UGS 
  *
  * @link https://developer.wordpress.org/advanced-administration/wordpress/wp-config/#table-prefix
  */
-$table_prefix = 'wp_geden_';
+$table_prefix = 'wp_geden_';
+
 
 /**
  * For developers: WordPress debugging mode.
@@ -85,7 +99,7 @@ $table_prefix = 'wp_geden_';
  *
  * @link https://developer.wordpress.org/advanced-administration/debug/debug-wordpress/
  */
-define( 'WP_DEBUG', false );
+define( 'WP_DEBUG', true );
 
 /* Add any custom values between this line and the "stop editing" line. */
 
