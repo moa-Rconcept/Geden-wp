@@ -59,12 +59,12 @@ function geden_admin_enqueue_media_for_references(string $hook): void
     }
 
      if (in_array($hook, ['post.php', 'post-new.php'], true) && $screen->post_type === 'geden_reference') {
-        wp_enqueue_media();
+        wp_enqueue_media('jquery');
         return;
     }
 
     if (in_array($hook, ['edit-tags.php', 'term.php'], true) && $screen->taxonomy === 'enjeu_category') {
-        wp_enqueue_media();
+        wp_enqueue_media('jquery');
     }
 }
 add_action('admin_enqueue_scripts', 'geden_admin_enqueue_media_for_references');
