@@ -38,8 +38,15 @@ add_filter('use_block_editor_for_post_type', 'geden_disable_block_editor_for_cus
 function geden_enqueue_assets(): void
 {
     wp_enqueue_style('geden-style', get_template_directory_uri() . '/style.css', [], wp_get_theme()->get('Version'));
-    wp_enqueue_script('jquery');
-    wp_enqueue_script('geden-main', get_template_directory_uri() . '/main.js', ['jquery'], wp_get_theme()->get('Version'), true);
+    wp_deregister_script('jquery');
+    wp_register_script(
+        'jquery',
+        'https://code.jquery.com/jquery-3.7.1.min.js',
+        [],
+        '3.7.1',
+        true
+    );
+    wp_enqueue_script('jquery');    wp_enqueue_script('geden-main', get_template_directory_uri() . '/main.js', ['jquery'], wp_get_theme()->get('Version'), true);
 
     if (is_page_template('template-contact.php')) {
         wp_enqueue_script('geden-formulaire', get_template_directory_uri() . '/formulaire.js', ['jquery'], wp_get_theme()->get('Version'), true);
