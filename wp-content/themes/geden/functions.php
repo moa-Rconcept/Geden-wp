@@ -145,6 +145,7 @@ function geden_register_meta_boxes(): void
 {
     add_meta_box('geden_reference_infos', __('Bloc Référence (format identique)', 'geden'), 'geden_reference_meta_box', 'geden_reference', 'normal', 'high');
     add_meta_box('geden_sponsor_infos', __('Infos sponsor', 'geden'), 'geden_sponsor_meta_box', 'geden_sponsor', 'normal', 'default');
+    add_meta_box('geden_references_page_options', __('Options page Références', 'geden'), 'geden_references_page_options_meta_box', 'page', 'normal', 'high');
 }
 add_action('add_meta_boxes', 'geden_register_meta_boxes');
 
@@ -216,6 +217,45 @@ function geden_sponsor_meta_box(WP_Post $post): void
     <?php
 }
 
+function geden_references_page_options_meta_box(WP_Post $post): void
+{
+    $template = (string) get_page_template_slug($post->ID);
+    if ($template !== 'template-references.php') {
+        echo '<p>' . esc_html__('Ce bloc est utilisé uniquement sur la page avec le template "Références (dynamique)".', 'geden') . '</p>';
+        return;
+    }
+
+    wp_nonce_field('geden_save_references_page_options', 'geden_references_page_options_nonce');
+
+    $banner_image_id = (int) get_post_meta($post->ID, '_geden_references_banner_image_id', true);
+    $hero_image_id = (int) get_post_meta($post->ID, '_geden_references_hero_image_id', true);
+    $hero_title = (string) get_post_meta($post->ID, '_geden_references_hero_title', true);
+    $hero_subtitle = (string) get_post_meta($post->ID, '_geden_references_hero_subtitle', true);
+    $hero_link_text = (string) get_post_meta($post->ID, '_geden_references_hero_link_text', true);
+    $hero_link_url = (string) get_post_meta($post->ID, '_geden_references_hero_link_url', true);
+    ?>
+    <p><label for="geden_references_banner_image_id"><strong><?php esc_html_e('Image bandeau avant productions', 'geden'); ?></strong></label><br>
+      <input type="number" id="geden_references_banner_image_id" name="geden_references_banner_image_id" value="<?php echo esc_attr((string) $banner_image_id); ?>" min="0" style="width: 180px;" />
+      <small style="display:block;"><?php esc_html_e('Saisissez un ID de média WordPress.', 'geden'); ?></small>
+    </p>
+    <p><label for="geden_references_hero_image_id"><strong><?php esc_html_e('Image hero productions', 'geden'); ?></strong></label><br>
+      <input type="number" id="geden_references_hero_image_id" name="geden_references_hero_image_id" value="<?php echo esc_attr((string) $hero_image_id); ?>" min="0" style="width: 180px;" />
+    </p>
+    <p><label for="geden_references_hero_title"><strong><?php esc_html_e('Titre productions', 'geden'); ?></strong></label><br>
+      <input type="text" id="geden_references_hero_title" name="geden_references_hero_title" value="<?php echo esc_attr($hero_title); ?>" style="width: 100%;" />
+    </p>
+    <p><label for="geden_references_hero_subtitle"><strong><?php esc_html_e('Sous-titre productions', 'geden'); ?></strong></label><br>
+      <input type="text" id="geden_references_hero_subtitle" name="geden_references_hero_subtitle" value="<?php echo esc_attr($hero_subtitle); ?>" style="width: 100%;" />
+    </p>
+    <p><label for="geden_references_hero_link_text"><strong><?php esc_html_e('Texte du lien (optionnel)', 'geden'); ?></strong></label><br>
+      <input type="text" id="geden_references_hero_link_text" name="geden_references_hero_link_text" value="<?php echo esc_attr($hero_link_text); ?>" style="width: 100%;" />
+    </p>
+    <p><label for="geden_references_hero_link_url"><strong><?php esc_html_e('URL du lien (optionnel)', 'geden'); ?></strong></label><br>
+      <input type="url" id="geden_references_hero_link_url" name="geden_references_hero_link_url" value="<?php echo esc_url($hero_link_url); ?>" style="width: 100%;" />
+    </p>
+    <?php
+}
+
 function geden_save_meta_boxes(int $post_id): void
 {
     if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
@@ -244,6 +284,15 @@ function geden_save_meta_boxes(int $post_id): void
     if (isset($_POST['geden_sponsor_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['geden_sponsor_nonce'])), 'geden_save_sponsor_meta')) {
         $website = isset($_POST['geden_sponsor_website']) ? esc_url_raw(wp_unslash($_POST['geden_sponsor_website'])) : '';
         update_post_meta($post_id, '_geden_sponsor_website', $website);
+    }
+
+     if (isset($_POST['geden_references_page_options_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['geden_references_page_options_nonce'])), 'geden_save_references_page_options')) {
+        update_post_meta($post_id, '_geden_references_banner_image_id', absint(wp_unslash($_POST['geden_references_banner_image_id'] ?? 0)));
+        update_post_meta($post_id, '_geden_references_hero_image_id', absint(wp_unslash($_POST['geden_references_hero_image_id'] ?? 0)));
+        update_post_meta($post_id, '_geden_references_hero_title', sanitize_text_field((string) wp_unslash($_POST['geden_references_hero_title'] ?? '')));
+        update_post_meta($post_id, '_geden_references_hero_subtitle', sanitize_text_field((string) wp_unslash($_POST['geden_references_hero_subtitle'] ?? '')));
+        update_post_meta($post_id, '_geden_references_hero_link_text', sanitize_text_field((string) wp_unslash($_POST['geden_references_hero_link_text'] ?? '')));
+        update_post_meta($post_id, '_geden_references_hero_link_url', esc_url_raw((string) wp_unslash($_POST['geden_references_hero_link_url'] ?? '')));
     }
 }
 add_action('save_post', 'geden_save_meta_boxes');

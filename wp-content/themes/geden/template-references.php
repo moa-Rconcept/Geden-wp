@@ -9,6 +9,30 @@ if (!defined('ABSPATH')) {
 }
 
 get_header();
+
+$page_id = get_queried_object_id();
+$banner_image_id = (int) get_post_meta($page_id, '_geden_references_banner_image_id', true);
+$hero_image_id = (int) get_post_meta($page_id, '_geden_references_hero_image_id', true);
+$hero_title = (string) get_post_meta($page_id, '_geden_references_hero_title', true);
+$hero_subtitle = (string) get_post_meta($page_id, '_geden_references_hero_subtitle', true);
+$hero_link_text = (string) get_post_meta($page_id, '_geden_references_hero_link_text', true);
+$hero_link_url = (string) get_post_meta($page_id, '_geden_references_hero_link_url', true);
+
+$banner_image_url = $banner_image_id > 0 ? wp_get_attachment_image_url($banner_image_id, 'full') : '';
+$hero_image_url = $hero_image_id > 0 ? wp_get_attachment_image_url($hero_image_id, 'full') : '';
+
+if ($hero_image_url === '') {
+    $hero_image_url = get_template_directory_uri() . '/img/arbres.jpg';
+}
+
+if ($hero_title === '') {
+    $hero_title = 'Productions techniques et scientifiques';
+}
+
+if ($hero_subtitle === '') {
+    $hero_subtitle = 'Publications, rapports et livrables – triés par année.';
+}
+
 ?>
 
 <section class="page-hero">
@@ -38,6 +62,11 @@ get_header();
         'orderby' => 'menu_order title',
         'order' => 'ASC',
     ]);
+    if (!$encours->have_posts()) :
+      ?>
+      <p class="ref-empty">Aucune réalisation en cours pour le moment.</p>
+      <?php
+    endif;
     while ($encours->have_posts()) : $encours->the_post();
       $post_id = get_the_ID();
       $client = (string) get_post_meta($post_id, '_geden_reference_client', true);
@@ -110,6 +139,11 @@ get_header();
         'orderby' => 'menu_order title',
         'order' => 'ASC',
     ]);
+    if (!$passees->have_posts()) :
+      ?>
+      <p class="ref-empty">Aucune réalisation effectuée pour le moment.</p>
+      <?php
+    endif;
     while ($passees->have_posts()) : $passees->the_post();
       $post_id = get_the_ID();
       $client = (string) get_post_meta($post_id, '_geden_reference_client', true);
@@ -168,15 +202,19 @@ get_header();
     <?php endwhile; wp_reset_postdata(); ?>
   </section>
 
-  <img class="fishingIMG" src="<?php echo esc_url(get_template_directory_uri() . '/img/pecheur calme.jpg'); ?>" alt="Pêcheur" loading="lazy">
-
+  <?php if ($banner_image_url !== '') : ?>
+    <img class="fishingIMG" src="<?php echo esc_url($banner_image_url); ?>" alt="Bandeau Références" loading="lazy">
+  <?php endif; ?>
   <section id="productions" class="section">
-    <article class="pubs-hero" style="--img:url('<?php echo esc_url(get_template_directory_uri() . '/img/arbres.jpg'); ?>')">
+    <article class="pubs-hero" style="--img:url('<?php echo esc_url($hero_image_url); ?>')">
       <div class="pubs-hero__bg"></div>
       <div class="pubs-hero__inner">
         <span class="pubs-hero__tag">Productions</span>
-        <h2 class="pubs-hero__title">Productions techniques et scientifiques</h2>
-        <p class="pubs-hero__lede">Publications, rapports et livrables – triés par année.</p>
+        <h2 class="pubs-hero__title"><?php echo esc_html($hero_title); ?></h2>
+        <p class="pubs-hero__lede"><?php echo esc_html($hero_subtitle); ?></p>
+        <?php if ($hero_link_text !== '' && $hero_link_url !== '') : ?>
+          <a class="pubs-hero__cta" href="<?php echo esc_url($hero_link_url); ?>"><?php echo esc_html($hero_link_text); ?></a>
+        <?php endif; ?>
       </div>
     </article>
 
@@ -205,6 +243,12 @@ get_header();
           $grouped[$year][] = get_post();
       }
       wp_reset_postdata();
+      
+       if (empty($grouped)) :
+        ?>
+        <p class="ref-empty">Aucune production technique ou scientifique pour le moment.</p>
+        <?php
+      endif;
 
       $is_first = true;
       foreach ($grouped as $year => $items) :
