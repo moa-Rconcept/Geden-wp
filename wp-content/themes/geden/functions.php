@@ -367,58 +367,69 @@ function geden_enjeu_meta_box(WP_Post $post): void
     <?php
 }
 
-function geden_enjeux_page_options_meta_box(WP_Post $post): void
+function geden_enjeu_category_add_form_fields(): void
 {
-    $template = (string) get_page_template_slug($post->ID);
-    if ($template !== 'template-enjeux.php') {
-        echo '<p>' . esc_html__('Ce bloc est utilisé uniquement sur la page avec le template "Enjeux dynamique".', 'geden') . '</p>';
-        return;
-    }
-
-    wp_nonce_field('geden_save_enjeux_page_options', 'geden_enjeux_page_options_nonce');
-
-    $fields = [
-        'subtitle' => (string) get_post_meta($post->ID, '_geden_enjeux_subtitle', true),
-        'enjeux_image_id' => (int) get_post_meta($post->ID, '_geden_enjeux_hero_image_id', true),
-        'enjeux_tag' => (string) get_post_meta($post->ID, '_geden_enjeux_hero_tag', true),
-        'enjeux_title' => (string) get_post_meta($post->ID, '_geden_enjeux_hero_title', true),
-        'enjeux_text' => (string) get_post_meta($post->ID, '_geden_enjeux_hero_text', true),
-        'permet_image_id' => (int) get_post_meta($post->ID, '_geden_permet_hero_image_id', true),
-        'permet_tag' => (string) get_post_meta($post->ID, '_geden_permet_hero_tag', true),
-        'permet_title' => (string) get_post_meta($post->ID, '_geden_permet_hero_title', true),
-        'permet_text' => (string) get_post_meta($post->ID, '_geden_permet_hero_text', true),
-        'problematiques_image_id' => (int) get_post_meta($post->ID, '_geden_problematiques_hero_image_id', true),
-        'problematiques_tag' => (string) get_post_meta($post->ID, '_geden_problematiques_hero_tag', true),
-        'problematiques_title' => (string) get_post_meta($post->ID, '_geden_problematiques_hero_title', true),
-        'problematiques_text' => (string) get_post_meta($post->ID, '_geden_problematiques_hero_text', true),
-    ];
     ?>
-    <p><label for="geden_enjeux_subtitle"><strong><?php esc_html_e('Sous-titre de page', 'geden'); ?></strong></label><br>
-      <input type="text" id="geden_enjeux_subtitle" name="geden_enjeux_subtitle" value="<?php echo esc_attr($fields['subtitle']); ?>" style="width: 100%;" />
-    </p>
-
-    <h4><?php esc_html_e('Bloc Enjeux', 'geden'); ?></h4>
-    <p><label for="geden_enjeux_hero_image_id"><strong><?php esc_html_e('ID image', 'geden'); ?></strong></label><br>
-      <input type="number" id="geden_enjeux_hero_image_id" name="geden_enjeux_hero_image_id" value="<?php echo esc_attr((string) $fields['enjeux_image_id']); ?>" min="0" style="width: 180px;" /></p>
-    <p><input type="text" name="geden_enjeux_hero_tag" value="<?php echo esc_attr($fields['enjeux_tag']); ?>" placeholder="<?php esc_attr_e('Tag (ex: Enjeux)', 'geden'); ?>" style="width: 100%;" /></p>
-    <p><input type="text" name="geden_enjeux_hero_title" value="<?php echo esc_attr($fields['enjeux_title']); ?>" placeholder="<?php esc_attr_e('Titre', 'geden'); ?>" style="width: 100%;" /></p>
-    <p><input type="text" name="geden_enjeux_hero_text" value="<?php echo esc_attr($fields['enjeux_text']); ?>" placeholder="<?php esc_attr_e('Texte', 'geden'); ?>" style="width: 100%;" /></p>
-
-    <h4><?php esc_html_e('Bloc Ce que cela permet', 'geden'); ?></h4>
-    <p><label for="geden_permet_hero_image_id"><strong><?php esc_html_e('ID image', 'geden'); ?></strong></label><br>
-      <input type="number" id="geden_permet_hero_image_id" name="geden_permet_hero_image_id" value="<?php echo esc_attr((string) $fields['permet_image_id']); ?>" min="0" style="width: 180px;" /></p>
-    <p><input type="text" name="geden_permet_hero_tag" value="<?php echo esc_attr($fields['permet_tag']); ?>" placeholder="<?php esc_attr_e('Tag', 'geden'); ?>" style="width: 100%;" /></p>
-    <p><input type="text" name="geden_permet_hero_title" value="<?php echo esc_attr($fields['permet_title']); ?>" placeholder="<?php esc_attr_e('Titre', 'geden'); ?>" style="width: 100%;" /></p>
-    <p><input type="text" name="geden_permet_hero_text" value="<?php echo esc_attr($fields['permet_text']); ?>" placeholder="<?php esc_attr_e('Texte', 'geden'); ?>" style="width: 100%;" /></p>
-
-    <h4><?php esc_html_e('Bloc Problématiques', 'geden'); ?></h4>
-    <p><label for="geden_problematiques_hero_image_id"><strong><?php esc_html_e('ID image', 'geden'); ?></strong></label><br>
-      <input type="number" id="geden_problematiques_hero_image_id" name="geden_problematiques_hero_image_id" value="<?php echo esc_attr((string) $fields['problematiques_image_id']); ?>" min="0" style="width: 180px;" /></p>
-    <p><input type="text" name="geden_problematiques_hero_tag" value="<?php echo esc_attr($fields['problematiques_tag']); ?>" placeholder="<?php esc_attr_e('Tag', 'geden'); ?>" style="width: 100%;" /></p>
-    <p><input type="text" name="geden_problematiques_hero_title" value="<?php echo esc_attr($fields['problematiques_title']); ?>" placeholder="<?php esc_attr_e('Titre', 'geden'); ?>" style="width: 100%;" /></p>
-    <p><input type="text" name="geden_problematiques_hero_text" value="<?php echo esc_attr($fields['problematiques_text']); ?>" placeholder="<?php esc_attr_e('Texte', 'geden'); ?>" style="width: 100%;" /></p>
+    <div class="form-field">
+      <label for="geden_enjeu_category_tag"><?php esc_html_e('Tag affiché sur le bloc', 'geden'); ?></label>
+      <input type="text" name="geden_enjeu_category_tag" id="geden_enjeu_category_tag" />
+    </div>
+    <div class="form-field">
+      <label for="geden_enjeu_category_title"><?php esc_html_e('Titre du bloc', 'geden'); ?></label>
+      <input type="text" name="geden_enjeu_category_title" id="geden_enjeu_category_title" />
+    </div>
+    <div class="form-field">
+      <label for="geden_enjeu_category_subtitle"><?php esc_html_e('Sous-titre du bloc', 'geden'); ?></label>
+      <textarea name="geden_enjeu_category_subtitle" id="geden_enjeu_category_subtitle" rows="4"></textarea>
+    </div>
+    <div class="form-field">
+      <label for="geden_enjeu_category_image_url"><?php esc_html_e('URL image du bloc', 'geden'); ?></label>
+      <input type="url" name="geden_enjeu_category_image_url" id="geden_enjeu_category_image_url" placeholder="https://..." />
+      <p><?php esc_html_e('Collez une URL d’image WordPress (Médias).', 'geden'); ?></p>
+    </div>
     <?php
 }
+add_action('enjeu_category_add_form_fields', 'geden_enjeu_category_add_form_fields');
+
+function geden_enjeu_category_edit_form_fields(WP_Term $term): void
+{
+    $tag = (string) get_term_meta($term->term_id, '_geden_enjeu_category_tag', true);
+    $title = (string) get_term_meta($term->term_id, '_geden_enjeu_category_title', true);
+    $subtitle = (string) get_term_meta($term->term_id, '_geden_enjeu_category_subtitle', true);
+    $image_url = (string) get_term_meta($term->term_id, '_geden_enjeu_category_image_url', true);
+    ?>
+    <tr class="form-field">
+      <th scope="row"><label for="geden_enjeu_category_tag"><?php esc_html_e('Tag affiché sur le bloc', 'geden'); ?></label></th>
+      <td><input type="text" name="geden_enjeu_category_tag" id="geden_enjeu_category_tag" value="<?php echo esc_attr($tag); ?>" /></td>
+    </tr>
+    <tr class="form-field">
+      <th scope="row"><label for="geden_enjeu_category_title"><?php esc_html_e('Titre du bloc', 'geden'); ?></label></th>
+      <td><input type="text" name="geden_enjeu_category_title" id="geden_enjeu_category_title" value="<?php echo esc_attr($title); ?>" /></td>
+    </tr>
+    <tr class="form-field">
+      <th scope="row"><label for="geden_enjeu_category_subtitle"><?php esc_html_e('Sous-titre du bloc', 'geden'); ?></label></th>
+      <td><textarea name="geden_enjeu_category_subtitle" id="geden_enjeu_category_subtitle" rows="4"><?php echo esc_textarea($subtitle); ?></textarea></td>
+    </tr>
+    <tr class="form-field">
+      <th scope="row"><label for="geden_enjeu_category_image_url"><?php esc_html_e('URL image du bloc', 'geden'); ?></label></th>
+      <td>
+        <input type="url" name="geden_enjeu_category_image_url" id="geden_enjeu_category_image_url" value="<?php echo esc_url($image_url); ?>" placeholder="https://..." />
+        <p class="description"><?php esc_html_e('Collez une URL d’image WordPress (Médias).', 'geden'); ?></p>
+      </td>
+    </tr>
+    <?php
+}
+add_action('enjeu_category_edit_form_fields', 'geden_enjeu_category_edit_form_fields');
+
+function geden_save_enjeu_category_meta(int $term_id): void
+{
+    update_term_meta($term_id, '_geden_enjeu_category_tag', sanitize_text_field((string) wp_unslash($_POST['geden_enjeu_category_tag'] ?? '')));
+    update_term_meta($term_id, '_geden_enjeu_category_title', sanitize_text_field((string) wp_unslash($_POST['geden_enjeu_category_title'] ?? '')));
+    update_term_meta($term_id, '_geden_enjeu_category_subtitle', sanitize_textarea_field((string) wp_unslash($_POST['geden_enjeu_category_subtitle'] ?? '')));
+    update_term_meta($term_id, '_geden_enjeu_category_image_url', esc_url_raw((string) wp_unslash($_POST['geden_enjeu_category_image_url'] ?? '')));
+}
+add_action('created_enjeu_category', 'geden_save_enjeu_category_meta');
+add_action('edited_enjeu_category', 'geden_save_enjeu_category_meta');
 
 function geden_save_meta_boxes(int $post_id): void
 {
@@ -529,6 +540,33 @@ function geden_get_enjeu_icon_svg(string $icon): string
     return $map[$icon] ?? $map['chart'];
 }
 
+function geden_get_enjeu_lines(int $post_id): array
+{
+    $raw = (string) get_post_meta($post_id, '_geden_enjeu_lines', true);
+    if ($raw === '') {
+        return [];
+    }
+    $lines = preg_split('/\r\n|\r|\n/', $raw) ?: [];
+    return array_values(array_filter(array_map('trim', $lines)));
+}
+
+function geden_get_enjeu_icon_svg(string $icon): string
+{
+    $map = [
+        'chart' => '<svg viewBox="0 0 24 24" fill="none"><path d="M4 18h16M6 15l4-4 3 3 5-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+        'clock' => '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="2"/><path d="M12 8v5l3 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+        'leaf' => '<svg viewBox="0 0 24 24" fill="none"><path d="M6 13c0-5 4-8 12-9-1 8-4 12-9 12-2 0-3-1-3-3Z" stroke="currentColor" stroke-width="2"/><path d="M10 14l5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+        'ruler' => '<svg viewBox="0 0 24 24" fill="none"><path d="M4 16h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M8 13v6M12 11v8M16 13v6" stroke="currentColor" stroke-width="2"/></svg>',
+        'shuffle' => '<svg viewBox="0 0 24 24" fill="none"><path d="M4 7h4l8 10h4M20 17l-2-2m2 2-2 2M4 17h4l2-2M14 9l2-2h4m0 0-2-2m2 2-2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+        'cross' => '<svg viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+        'megaphone' => '<svg viewBox="0 0 24 24" fill="none"><path d="M4 13v-2l11-4v10L4 13Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M8 14v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+        'people' => '<svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3" stroke="currentColor" stroke-width="2"/><path d="M3 18c1.5-3 3.5-4 6-4s4.5 1 6 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M16 10c1.7.2 3 1.2 4 3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+        'bubble' => '<svg viewBox="0 0 24 24" fill="none"><path d="M6 17l-2 3v-3a7 7 0 1 1 2 0Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>',
+        'check' => '<svg viewBox="0 0 24 24" fill="none"><path d="M7 12l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="2"/></svg>',
+    ];
+    return $map[$icon] ?? $map['chart'];
+}
+
 function geden_get_reference_sponsors(int $post_id): array
 {
     $ids_csv = (string) get_post_meta($post_id, '_geden_reference_sponsor_ids', true);
@@ -588,8 +626,11 @@ function geden_seed_default_terms(): void
             'productions-techniques-scientifiques' => 'Productions techniques et scientifiques',
         ],
         'presentation_category' => ['blocs-presentation' => 'Blocs présentation'],
-        'enjeu_category' => ['blocs-enjeux' => 'Blocs enjeux'],
-        'offre_category' => ['blocs-offres' => 'Blocs offres'],
+        'enjeu_category' => [
+            'blocs-enjeux' => 'Blocs enjeux',
+            'blocs-permet' => 'Blocs ce que cela permet',
+            'blocs-problematiques' => 'Blocs problématiques',
+        ],        'offre_category' => ['blocs-offres' => 'Blocs offres'],
     ];
 
     foreach ($default_terms as $taxonomy => $terms) {
@@ -604,12 +645,14 @@ add_action('init', 'geden_seed_default_terms', 20);
 
 function geden_register_admin_shortcuts(): void
 {
-    add_submenu_page('edit.php?post_type=geden_reference', 'Réalisations en cours', 'Réalisations en cours', 'edit_posts', 'edit.php?post_type=geden_reference&reference_category=realisations-en-cours');
+     add_submenu_page('edit.php?post_type=geden_reference', 'Réalisations en cours', 'Réalisations en cours', 'edit_posts', 'edit.php?post_type=geden_reference&reference_category=realisations-en-cours');
     add_submenu_page('edit.php?post_type=geden_reference', 'Réalisations effectuées', 'Réalisations effectuées', 'edit_posts', 'edit.php?post_type=geden_reference&reference_category=realisations-effectuees');
     add_submenu_page('edit.php?post_type=geden_reference', 'Productions', 'Productions', 'edit_posts', 'edit.php?post_type=geden_reference&reference_category=productions-techniques-scientifiques');
 
     add_submenu_page('edit.php?post_type=geden_presentation', 'Blocs Présentation', 'Blocs Présentation', 'edit_posts', 'edit.php?post_type=geden_presentation&presentation_category=blocs-presentation');
     add_submenu_page('edit.php?post_type=geden_enjeu', 'Blocs Enjeux', 'Blocs Enjeux', 'edit_posts', 'edit.php?post_type=geden_enjeu&enjeu_category=blocs-enjeux');
+    add_submenu_page('edit.php?post_type=geden_enjeu', 'Blocs Ce que cela permet', 'Blocs Ce que cela permet', 'edit_posts', 'edit.php?post_type=geden_enjeu&enjeu_category=blocs-permet');
+    add_submenu_page('edit.php?post_type=geden_enjeu', 'Blocs Problématiques', 'Blocs Problématiques', 'edit_posts', 'edit.php?post_type=geden_enjeu&enjeu_category=blocs-problematiques');
     add_submenu_page('edit.php?post_type=geden_offre', 'Blocs Offres', 'Blocs Offres', 'edit_posts', 'edit.php?post_type=geden_offre&offre_category=blocs-offres');
 }
 add_action('admin_menu', 'geden_register_admin_shortcuts');
