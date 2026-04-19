@@ -53,16 +53,19 @@ add_action('wp_enqueue_scripts', 'geden_enqueue_assets');
 
 function geden_admin_enqueue_media_for_references(string $hook): void
 {
-    if (!in_array($hook, ['post.php', 'post-new.php'], true)) {
-        return;
-    }
-
     $screen = get_current_screen();
-    if (!$screen || $screen->post_type !== 'geden_reference') {
+    if (!$screen) {
         return;
     }
 
-    wp_enqueue_media();
+     if (in_array($hook, ['post.php', 'post-new.php'], true) && $screen->post_type === 'geden_reference') {
+        wp_enqueue_media();
+        return;
+    }
+
+    if (in_array($hook, ['edit-tags.php', 'term.php'], true) && $screen->taxonomy === 'enjeu_category') {
+        wp_enqueue_media();
+    }
 }
 add_action('admin_enqueue_scripts', 'geden_admin_enqueue_media_for_references');
 
@@ -366,6 +369,7 @@ function geden_enjeu_meta_box(WP_Post $post): void
     <?php
 }
 
+
 function geden_enjeu_category_add_form_fields(): void
 {
     ?>
@@ -382,10 +386,34 @@ function geden_enjeu_category_add_form_fields(): void
       <textarea name="geden_enjeu_category_subtitle" id="geden_enjeu_category_subtitle" rows="4"></textarea>
     </div>
     <div class="form-field">
-      <label for="geden_enjeu_category_image_url"><?php esc_html_e('URL image du bloc', 'geden'); ?></label>
-      <input type="url" name="geden_enjeu_category_image_url" id="geden_enjeu_category_image_url" placeholder="https://..." />
-      <p><?php esc_html_e('Collez une URL d’image WordPress (Médias).', 'geden'); ?></p>
+      <label for="geden_enjeu_category_image_id"><?php esc_html_e('Image du bloc', 'geden'); ?></label>
+      <input type="hidden" name="geden_enjeu_category_image_id" id="geden_enjeu_category_image_id" value="0" />
+      <input type="text" id="geden_enjeu_category_image_url" value="" placeholder="<?php esc_attr_e('Aucune image sélectionnée', 'geden'); ?>" readonly />
+      <button type="button" class="button" id="geden_pick_enjeu_category_image"><?php esc_html_e('Choisir image', 'geden'); ?></button>
+      <button type="button" class="button-link-delete" id="geden_clear_enjeu_category_image"><?php esc_html_e('Supprimer', 'geden'); ?></button>
+      <p><?php esc_html_e('Utilisez la médiathèque WordPress.', 'geden'); ?></p>
     </div>
+    <script>
+      (function($){
+        const idField = $('#geden_enjeu_category_image_id');
+        const urlField = $('#geden_enjeu_category_image_url');
+        $('#geden_pick_enjeu_category_image').on('click', function(e){
+          e.preventDefault();
+          const frame = wp.media({ title: '<?php echo esc_js(__('Choisir une image', 'geden')); ?>', multiple: false, library: { type: 'image' } });
+          frame.on('select', function(){
+            const image = frame.state().get('selection').first().toJSON();
+            idField.val(image.id || 0);
+            urlField.val(image.url || '');
+          });
+          frame.open();
+        });
+        $('#geden_clear_enjeu_category_image').on('click', function(e){
+          e.preventDefault();
+          idField.val(0);
+          urlField.val('');
+        });
+      })(jQuery);
+    </script>
     <?php
 }
 add_action('enjeu_category_add_form_fields', 'geden_enjeu_category_add_form_fields');
@@ -395,7 +423,8 @@ function geden_enjeu_category_edit_form_fields(WP_Term $term): void
     $tag = (string) get_term_meta($term->term_id, '_geden_enjeu_category_tag', true);
     $title = (string) get_term_meta($term->term_id, '_geden_enjeu_category_title', true);
     $subtitle = (string) get_term_meta($term->term_id, '_geden_enjeu_category_subtitle', true);
-    $image_url = (string) get_term_meta($term->term_id, '_geden_enjeu_category_image_url', true);
+    $image_id = (int) get_term_meta($term->term_id, '_geden_enjeu_category_image_id', true);
+    $image_url = $image_id > 0 ? (string) wp_get_attachment_image_url($image_id, 'full') : (string) get_term_meta($term->term_id, '_geden_enjeu_category_image_url', true);
     ?>
     <tr class="form-field">
       <th scope="row"><label for="geden_enjeu_category_tag"><?php esc_html_e('Tag affiché sur le bloc', 'geden'); ?></label></th>
@@ -410,12 +439,36 @@ function geden_enjeu_category_edit_form_fields(WP_Term $term): void
       <td><textarea name="geden_enjeu_category_subtitle" id="geden_enjeu_category_subtitle" rows="4"><?php echo esc_textarea($subtitle); ?></textarea></td>
     </tr>
     <tr class="form-field">
-      <th scope="row"><label for="geden_enjeu_category_image_url"><?php esc_html_e('URL image du bloc', 'geden'); ?></label></th>
+      <th scope="row"><label for="geden_enjeu_category_image_id"><?php esc_html_e('Image du bloc', 'geden'); ?></label></th>
       <td>
-        <input type="url" name="geden_enjeu_category_image_url" id="geden_enjeu_category_image_url" value="<?php echo esc_url($image_url); ?>" placeholder="https://..." />
-        <p class="description"><?php esc_html_e('Collez une URL d’image WordPress (Médias).', 'geden'); ?></p>
+        <input type="hidden" name="geden_enjeu_category_image_id" id="geden_enjeu_category_image_id" value="<?php echo esc_attr((string) $image_id); ?>" />
+        <input type="text" id="geden_enjeu_category_image_url" value="<?php echo esc_url($image_url); ?>" placeholder="<?php esc_attr_e('Aucune image sélectionnée', 'geden'); ?>" readonly style="min-width:360px;" />
+        <button type="button" class="button" id="geden_pick_enjeu_category_image"><?php esc_html_e('Choisir image', 'geden'); ?></button>
+        <button type="button" class="button-link-delete" id="geden_clear_enjeu_category_image"><?php esc_html_e('Supprimer', 'geden'); ?></button>
+        <p class="description"><?php esc_html_e('Utilisez la médiathèque WordPress.', 'geden'); ?></p>
       </td>
     </tr>
+    <script>
+      (function($){
+        const idField = $('#geden_enjeu_category_image_id');
+        const urlField = $('#geden_enjeu_category_image_url');
+        $('#geden_pick_enjeu_category_image').on('click', function(e){
+          e.preventDefault();
+          const frame = wp.media({ title: '<?php echo esc_js(__('Choisir une image', 'geden')); ?>', multiple: false, library: { type: 'image' } });
+          frame.on('select', function(){
+            const image = frame.state().get('selection').first().toJSON();
+            idField.val(image.id || 0);
+            urlField.val(image.url || '');
+          });
+          frame.open();
+        });
+        $('#geden_clear_enjeu_category_image').on('click', function(e){
+          e.preventDefault();
+          idField.val(0);
+          urlField.val('');
+        });
+      })(jQuery);
+    </script>
     <?php
 }
 add_action('enjeu_category_edit_form_fields', 'geden_enjeu_category_edit_form_fields');
@@ -425,10 +478,11 @@ function geden_save_enjeu_category_meta(int $term_id): void
     update_term_meta($term_id, '_geden_enjeu_category_tag', sanitize_text_field((string) wp_unslash($_POST['geden_enjeu_category_tag'] ?? '')));
     update_term_meta($term_id, '_geden_enjeu_category_title', sanitize_text_field((string) wp_unslash($_POST['geden_enjeu_category_title'] ?? '')));
     update_term_meta($term_id, '_geden_enjeu_category_subtitle', sanitize_textarea_field((string) wp_unslash($_POST['geden_enjeu_category_subtitle'] ?? '')));
-    update_term_meta($term_id, '_geden_enjeu_category_image_url', esc_url_raw((string) wp_unslash($_POST['geden_enjeu_category_image_url'] ?? '')));
+    update_term_meta($term_id, '_geden_enjeu_category_image_id', absint($_POST['geden_enjeu_category_image_id'] ?? 0));
 }
 add_action('created_enjeu_category', 'geden_save_enjeu_category_meta');
 add_action('edited_enjeu_category', 'geden_save_enjeu_category_meta');
+
 function geden_save_meta_boxes(int $post_id): void
 {
     if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {

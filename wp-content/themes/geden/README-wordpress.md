@@ -26,7 +26,25 @@ La page **Références (dynamique)** est maintenant alignée sur la structure de
 - Image mise en avant = logo
 - Lien site sponsor = URL optionnelle
 
+## Mise à jour importante (page Problématiques & Enjeux)
+La page **Enjeux dynamique** affiche maintenant 3 blocs distincts :
+- **Enjeux** (catégorie `blocs-enjeux`)
+- **Ce que cela permet** (catégorie `blocs-permet`)
+- **Problématiques** (catégorie `blocs-problematiques`)
 
+### Saisie admin (WordPress)
+#### Élément Enjeux
+- Assigner la catégorie `enjeu_category` correspondant au bloc visé.
+- Meta box:
+  - Couleur du picto
+  - Icône
+  - Texte court (optionnel)
+  - Liste (1 ligne = 1 puce)
+
+#### Page "Problématiques et Enjeux"
+- Meta box **Options page Problématiques & Enjeux** :
+  - sous-titre de page,
+  - image / tag / titre / texte pour chacun des 3 héros (Enjeux, Ce que cela permet, Problématiques).
 ## Modèles de pages conseillés
 - Présentation -> `Présentation (dynamique)`
 - Problématiques et Enjeux -> `Problématiques & Enjeux (dynamique)`
