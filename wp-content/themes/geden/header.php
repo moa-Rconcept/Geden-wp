@@ -38,8 +38,7 @@ if (is_page()) {
       <img src="<?php echo esc_url(get_template_directory_uri() . '/logo.png'); ?>" alt="Logo GeDEN" height="80">
       <div class="brand__title">
         <div class="brand__tag">
-          <?php var_dump(get_bloginfo('description')); ?>
-        </div>
+<?php var_dump(get_option('blogdescription')); ?>        </div>
       </div>
     </a>
 
