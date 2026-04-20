@@ -70,8 +70,8 @@ function geden_admin_enqueue_media_for_references(string $hook): void
         return;
     }
 
-    if (in_array($hook, ['edit-tags.php', 'term.php'], true) && $screen->taxonomy === 'enjeu_category') {
-        wp_enqueue_media('jquery');
+    if (in_array($hook, ['edit-tags.php', 'term.php'], true) && in_array($screen->taxonomy, ['enjeu_category', 'offre_category'], true)) {
+              wp_enqueue_media('jquery');
     }
 }
 add_action('admin_enqueue_scripts', 'geden_admin_enqueue_media_for_references');
@@ -490,6 +490,118 @@ function geden_save_enjeu_category_meta(int $term_id): void
 add_action('created_enjeu_category', 'geden_save_enjeu_category_meta');
 add_action('edited_enjeu_category', 'geden_save_enjeu_category_meta');
 
+function geden_offre_category_add_form_fields(): void
+{
+    ?>
+    <div class="form-field">
+      <label for="geden_offre_category_tag"><?php esc_html_e('Tag affiché sur le bloc', 'geden'); ?></label>
+      <input type="text" name="geden_offre_category_tag" id="geden_offre_category_tag" />
+    </div>
+    <div class="form-field">
+      <label for="geden_offre_category_title"><?php esc_html_e('Titre du bloc', 'geden'); ?></label>
+      <input type="text" name="geden_offre_category_title" id="geden_offre_category_title" />
+    </div>
+    <div class="form-field">
+      <label for="geden_offre_category_subtitle"><?php esc_html_e('Sous-titre du bloc', 'geden'); ?></label>
+      <textarea name="geden_offre_category_subtitle" id="geden_offre_category_subtitle" rows="4"></textarea>
+    </div>
+    <div class="form-field">
+      <label for="geden_offre_category_image_id"><?php esc_html_e('Image du bloc', 'geden'); ?></label>
+      <input type="hidden" name="geden_offre_category_image_id" id="geden_offre_category_image_id" value="0" />
+      <input type="text" id="geden_offre_category_image_url" value="" placeholder="<?php esc_attr_e('Aucune image sélectionnée', 'geden'); ?>" readonly />
+      <button type="button" class="button" id="geden_pick_offre_category_image"><?php esc_html_e('Choisir image', 'geden'); ?></button>
+      <button type="button" class="button-link-delete" id="geden_clear_offre_category_image"><?php esc_html_e('Supprimer', 'geden'); ?></button>
+      <p><?php esc_html_e('Utilisez la médiathèque WordPress.', 'geden'); ?></p>
+    </div>
+    <script>
+      (function($){
+        const idField = $('#geden_offre_category_image_id');
+        const urlField = $('#geden_offre_category_image_url');
+        $('#geden_pick_offre_category_image').on('click', function(e){
+          e.preventDefault();
+          const frame = wp.media({ title: '<?php echo esc_js(__('Choisir une image', 'geden')); ?>', multiple: false, library: { type: 'image' } });
+          frame.on('select', function(){
+            const image = frame.state().get('selection').first().toJSON();
+            idField.val(image.id || 0);
+            urlField.val(image.url || '');
+          });
+          frame.open();
+        });
+        $('#geden_clear_offre_category_image').on('click', function(e){
+          e.preventDefault();
+          idField.val(0);
+          urlField.val('');
+        });
+      })(jQuery);
+    </script>
+    <?php
+}
+add_action('offre_category_add_form_fields', 'geden_offre_category_add_form_fields');
+
+function geden_offre_category_edit_form_fields(WP_Term $term): void
+{
+    $tag = (string) get_term_meta($term->term_id, '_geden_offre_category_tag', true);
+    $title = (string) get_term_meta($term->term_id, '_geden_offre_category_title', true);
+    $subtitle = (string) get_term_meta($term->term_id, '_geden_offre_category_subtitle', true);
+    $image_id = (int) get_term_meta($term->term_id, '_geden_offre_category_image_id', true);
+    $image_url = $image_id > 0 ? (string) wp_get_attachment_image_url($image_id, 'full') : '';
+    ?>
+    <tr class="form-field">
+      <th scope="row"><label for="geden_offre_category_tag"><?php esc_html_e('Tag affiché sur le bloc', 'geden'); ?></label></th>
+      <td><input type="text" name="geden_offre_category_tag" id="geden_offre_category_tag" value="<?php echo esc_attr($tag); ?>" /></td>
+    </tr>
+    <tr class="form-field">
+      <th scope="row"><label for="geden_offre_category_title"><?php esc_html_e('Titre du bloc', 'geden'); ?></label></th>
+      <td><input type="text" name="geden_offre_category_title" id="geden_offre_category_title" value="<?php echo esc_attr($title); ?>" /></td>
+    </tr>
+    <tr class="form-field">
+      <th scope="row"><label for="geden_offre_category_subtitle"><?php esc_html_e('Sous-titre du bloc', 'geden'); ?></label></th>
+      <td><textarea name="geden_offre_category_subtitle" id="geden_offre_category_subtitle" rows="4"><?php echo esc_textarea($subtitle); ?></textarea></td>
+    </tr>
+    <tr class="form-field">
+      <th scope="row"><label for="geden_offre_category_image_id"><?php esc_html_e('Image du bloc', 'geden'); ?></label></th>
+      <td>
+        <input type="hidden" name="geden_offre_category_image_id" id="geden_offre_category_image_id" value="<?php echo esc_attr((string) $image_id); ?>" />
+        <input type="text" id="geden_offre_category_image_url" value="<?php echo esc_url($image_url); ?>" placeholder="<?php esc_attr_e('Aucune image sélectionnée', 'geden'); ?>" readonly style="min-width:360px;" />
+        <button type="button" class="button" id="geden_pick_offre_category_image"><?php esc_html_e('Choisir image', 'geden'); ?></button>
+        <button type="button" class="button-link-delete" id="geden_clear_offre_category_image"><?php esc_html_e('Supprimer', 'geden'); ?></button>
+      </td>
+    </tr>
+    <script>
+      (function($){
+        const idField = $('#geden_offre_category_image_id');
+        const urlField = $('#geden_offre_category_image_url');
+        $('#geden_pick_offre_category_image').on('click', function(e){
+          e.preventDefault();
+          const frame = wp.media({ title: '<?php echo esc_js(__('Choisir une image', 'geden')); ?>', multiple: false, library: { type: 'image' } });
+          frame.on('select', function(){
+            const image = frame.state().get('selection').first().toJSON();
+            idField.val(image.id || 0);
+            urlField.val(image.url || '');
+          });
+          frame.open();
+        });
+        $('#geden_clear_offre_category_image').on('click', function(e){
+          e.preventDefault();
+          idField.val(0);
+          urlField.val('');
+        });
+      })(jQuery);
+    </script>
+    <?php
+}
+add_action('offre_category_edit_form_fields', 'geden_offre_category_edit_form_fields');
+
+function geden_save_offre_category_meta(int $term_id): void
+{
+    update_term_meta($term_id, '_geden_offre_category_tag', sanitize_text_field((string) wp_unslash($_POST['geden_offre_category_tag'] ?? '')));
+    update_term_meta($term_id, '_geden_offre_category_title', sanitize_text_field((string) wp_unslash($_POST['geden_offre_category_title'] ?? '')));
+    update_term_meta($term_id, '_geden_offre_category_subtitle', sanitize_textarea_field((string) wp_unslash($_POST['geden_offre_category_subtitle'] ?? '')));
+    update_term_meta($term_id, '_geden_offre_category_image_id', absint($_POST['geden_offre_category_image_id'] ?? 0));
+}
+add_action('created_offre_category', 'geden_save_offre_category_meta');
+add_action('edited_offre_category', 'geden_save_offre_category_meta');
+
 function geden_save_meta_boxes(int $post_id): void
 {
     if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
@@ -649,6 +761,13 @@ function geden_seed_default_terms(): void
             'blocs-problematiques' => 'Blocs problématiques',
         ],
         'offre_category' => ['blocs-offres' => 'Blocs offres'],
+        'offre_category' => [
+            'blocs-offres' => 'Blocs offres',
+            'frequentation' => 'Fréquentation',
+            'enquetes' => 'Enquêtes',
+            'entretiens' => 'Entretiens',
+            'outils-analytiques' => 'Outils analytiques',
+        ],
     ];
 
     foreach ($default_terms as $taxonomy => $terms) {
@@ -672,5 +791,9 @@ function geden_register_admin_shortcuts(): void
     add_submenu_page('edit.php?post_type=geden_enjeu', 'Blocs Ce que cela permet', 'Blocs Ce que cela permet', 'edit_posts', 'edit.php?post_type=geden_enjeu&enjeu_category=blocs-permet');
     add_submenu_page('edit.php?post_type=geden_enjeu', 'Blocs Problématiques', 'Blocs Problématiques', 'edit_posts', 'edit.php?post_type=geden_enjeu&enjeu_category=blocs-problematiques');
     add_submenu_page('edit.php?post_type=geden_offre', 'Blocs Offres', 'Blocs Offres', 'edit_posts', 'edit.php?post_type=geden_offre&offre_category=blocs-offres');
+    add_submenu_page('edit.php?post_type=geden_offre', 'Fréquentation', 'Fréquentation', 'edit_posts', 'edit.php?post_type=geden_offre&offre_category=frequentation');
+    add_submenu_page('edit.php?post_type=geden_offre', 'Enquêtes', 'Enquêtes', 'edit_posts', 'edit.php?post_type=geden_offre&offre_category=enquetes');
+    add_submenu_page('edit.php?post_type=geden_offre', 'Entretiens', 'Entretiens', 'edit_posts', 'edit.php?post_type=geden_offre&offre_category=entretiens');
+    add_submenu_page('edit.php?post_type=geden_offre', 'Outils analytiques', 'Outils analytiques', 'edit_posts', 'edit.php?post_type=geden_offre&offre_category=outils-analytiques');
 }
 add_action('admin_menu', 'geden_register_admin_shortcuts');
