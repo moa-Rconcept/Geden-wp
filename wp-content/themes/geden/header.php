@@ -37,7 +37,7 @@ if (is_page()) {
     <a class="brand" href="<?php echo esc_url(home_url('/')); ?>">
       <img src="<?php echo esc_url(get_template_directory_uri() . '/logo.png'); ?>" alt="Logo GeDEN" height="80">
       <div class="brand__title">
-        <div class="brand__tag"><?php bloginfo('description'); ?></div>
+        <div class="brand__tag">Gestion durable des espaces naturels</div>
       </div>
     </a>
 
