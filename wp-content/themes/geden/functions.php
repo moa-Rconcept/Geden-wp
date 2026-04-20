@@ -46,7 +46,8 @@ function geden_enqueue_assets(): void
         '3.7.1',
         true
     );
-    wp_enqueue_script('jquery');    wp_enqueue_script('geden-main', get_template_directory_uri() . '/main.js', ['jquery'], wp_get_theme()->get('Version'), true);
+    wp_enqueue_script('jquery');    
+    wp_enqueue_script('geden-main', get_template_directory_uri() . '/main.js', ['jquery'], wp_get_theme()->get('Version'), true);
 
     if (is_page_template('template-contact.php')) {
         wp_enqueue_script('geden-formulaire', get_template_directory_uri() . '/formulaire.js', ['jquery'], wp_get_theme()->get('Version'), true);
@@ -66,12 +67,12 @@ function geden_admin_enqueue_media_for_references(string $hook): void
     }
 
      if (in_array($hook, ['post.php', 'post-new.php'], true) && $screen->post_type === 'geden_reference') {
-        wp_enqueue_media('jquery');
+        wp_enqueue_media();
         return;
     }
 
     if (in_array($hook, ['edit-tags.php', 'term.php'], true) && in_array($screen->taxonomy, ['enjeu_category', 'offre_category'], true)) {
-        wp_enqueue_media('jquery');
+        wp_enqueue_media();
     }
 }
 add_action('admin_enqueue_scripts', 'geden_admin_enqueue_media_for_references');
@@ -197,6 +198,7 @@ function geden_reference_meta_box(WP_Post $post): void
     $services = (string) get_post_meta($post->ID, '_geden_reference_services', true);
     $authors = (string) get_post_meta($post->ID, '_geden_reference_authors', true);
    $saved_logos = geden_get_reference_sponsor_logos($post->ID);
+   $deliverable = (string) get_post_meta($post->ID, '_geden_reference_deliverable', true);
     if (empty($saved_logos)) {
         $saved_logos = [['name' => '', 'url' => '', 'image_id' => 0]];
     }
@@ -666,16 +668,6 @@ function geden_save_offre_category_meta(int $term_id): void
 add_action('created_offre_category', 'geden_save_offre_category_meta');
 add_action('edited_offre_category', 'geden_save_offre_category_meta');
 
-function geden_save_offre_category_meta(int $term_id): void
-{
-    update_term_meta($term_id, '_geden_offre_category_tag', sanitize_text_field((string) wp_unslash($_POST['geden_offre_category_tag'] ?? '')));
-    update_term_meta($term_id, '_geden_offre_category_title', sanitize_text_field((string) wp_unslash($_POST['geden_offre_category_title'] ?? '')));
-    update_term_meta($term_id, '_geden_offre_category_subtitle', sanitize_textarea_field((string) wp_unslash($_POST['geden_offre_category_subtitle'] ?? '')));
-    update_term_meta($term_id, '_geden_offre_category_image_id', absint($_POST['geden_offre_category_image_id'] ?? 0));
-}
-add_action('created_offre_category', 'geden_save_offre_category_meta');
-add_action('edited_offre_category', 'geden_save_offre_category_meta');
-
 function geden_save_meta_boxes(int $post_id): void
 {
     if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
@@ -685,7 +677,8 @@ function geden_save_meta_boxes(int $post_id): void
         return;
     }
 
-    if (isset($_POST['geden_reference_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['geden_reference_nonce'])), 'geden_save_reference_meta')) {
+    if (isset($_POST['geden_reference_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['geden_reference_nonce'])), 'geden_save_reference_meta'))
+      {
         update_post_meta($post_id, '_geden_reference_year', sanitize_text_field((string) wp_unslash($_POST['geden_reference_year'] ?? '')));
         update_post_meta($post_id, '_geden_reference_client', sanitize_text_field((string) wp_unslash($_POST['geden_reference_client'] ?? '')));
         update_post_meta($post_id, '_geden_reference_link', esc_url_raw((string) wp_unslash($_POST['geden_reference_link'] ?? '')));
@@ -707,7 +700,8 @@ function geden_save_meta_boxes(int $post_id): void
             }
             $logos[] = ['name' => $name, 'url' => $url, 'image_id' => $image_id];
         }
-        update_post_meta($post_id, '_geden_reference_sponsor_logos', wp_json_encode($logos));    }
+        update_post_meta($post_id, '_geden_reference_sponsor_logos', wp_json_encode($logos));    
+      }
 
     if (isset($_POST['geden_sponsor_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['geden_sponsor_nonce'])), 'geden_save_sponsor_meta')) {
         $website = isset($_POST['geden_sponsor_website']) ? esc_url_raw(wp_unslash($_POST['geden_sponsor_website'])) : '';
