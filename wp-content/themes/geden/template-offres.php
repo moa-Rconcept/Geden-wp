@@ -9,6 +9,7 @@ if (!defined('ABSPATH')) {
 }
 
 get_header();
+
 $page_id = get_queried_object_id();
 $subtitle = has_excerpt($page_id) ? get_the_excerpt($page_id) : '';
 $terms = get_terms([
@@ -25,7 +26,6 @@ $section_classes = [
     'entretiens' => 'section section-service-block',
     'outils-analytiques' => 'section section-service-tools',
 ];
-
 ?>
 <section class="page-hero">
   <div class="container">
@@ -37,12 +37,6 @@ $section_classes = [
 </section>
 
 <main class="container">
-  <section class="section">
-    <?php while (have_posts()) : the_post(); ?>
-      <?php the_content(); ?>
-    <?php endwhile; ?>
-  </section>
-
   <?php while (have_posts()) : the_post(); ?>
     <?php if (trim((string) get_the_content()) !== '') : ?>
       <section class="section">
@@ -100,8 +94,10 @@ $section_classes = [
         <p class="ref-empty">Aucun bloc trouvé pour la catégorie <code><?php echo esc_html($term->slug); ?></code>.</p>
       <?php endif; ?>
 
-      <?php while ($items->have_posts()) : $items->the_post();?>
-       <?php if ($term->slug === 'blocs-offres') : ?>
+      <?php
+      while ($items->have_posts()) : $items->the_post();
+      ?>
+        <?php if ($term->slug === 'blocs-offres') : ?>
           <article class="services-card">
             <h3><?php the_title(); ?></h3>
             <?php if (has_excerpt()) : ?>
@@ -121,7 +117,7 @@ $section_classes = [
           </article>
         <?php endif; ?>
       <?php endwhile; wp_reset_postdata(); ?>
-     </div>
+      </div>
     </section>
   <?php endforeach; ?>
 </main>
