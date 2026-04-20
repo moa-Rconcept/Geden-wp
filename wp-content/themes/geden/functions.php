@@ -27,7 +27,7 @@ add_action('after_setup_theme', 'geden_theme_setup');
 
 function geden_disable_block_editor_for_custom_content(bool $use_block_editor, string $post_type): bool
 {
-    if (in_array($post_type, ['geden_reference', 'geden_sponsor', 'geden_enjeu'], true)) {
+    if (in_array($post_type, ['geden_reference', 'geden_sponsor', 'geden_enjeu', 'geden_offre'], true)) {
         return false;
     }
 
@@ -71,7 +71,7 @@ function geden_admin_enqueue_media_for_references(string $hook): void
     }
 
     if (in_array($hook, ['edit-tags.php', 'term.php'], true) && in_array($screen->taxonomy, ['enjeu_category', 'offre_category'], true)) {
-              wp_enqueue_media('jquery');
+        wp_enqueue_media('jquery');
     }
 }
 add_action('admin_enqueue_scripts', 'geden_admin_enqueue_media_for_references');
@@ -181,6 +181,7 @@ function geden_register_meta_boxes(): void
     add_meta_box('geden_reference_infos', __('Bloc Référence (format identique)', 'geden'), 'geden_reference_meta_box', 'geden_reference', 'normal', 'high');
     add_meta_box('geden_sponsor_infos', __('Infos sponsor', 'geden'), 'geden_sponsor_meta_box', 'geden_sponsor', 'normal', 'default');
     add_meta_box('geden_enjeu_infos', __('Bloc Enjeu / Problématique', 'geden'), 'geden_enjeu_meta_box', 'geden_enjeu', 'normal', 'high');
+    add_meta_box('geden_offre_infos', __('Bloc Offre / Service', 'geden'), 'geden_offre_meta_box', 'geden_offre', 'normal', 'high');
     add_meta_box('geden_references_page_options', __('Options page Références', 'geden'), 'geden_references_page_options_meta_box', 'page', 'normal', 'high');
 }
 add_action('add_meta_boxes', 'geden_register_meta_boxes');
@@ -376,6 +377,69 @@ function geden_enjeu_meta_box(WP_Post $post): void
     <?php
 }
 
+function geden_offre_meta_box(WP_Post $post): void
+{
+    wp_nonce_field('geden_save_offre_meta', 'geden_offre_nonce');
+    $badge = (string) get_post_meta($post->ID, '_geden_offre_badge', true);
+    $icon = (string) get_post_meta($post->ID, '_geden_offre_icon', true);
+    $text = (string) get_post_meta($post->ID, '_geden_offre_text', true);
+    $lines = (string) get_post_meta($post->ID, '_geden_offre_lines', true);
+    if ($badge === '') {
+        $badge = 'badge-blue';
+    }
+    if ($icon === '') {
+        $icon = 'chart';
+    }
+    ?>
+    <p><strong><?php esc_html_e('Astuce catégorie', 'geden'); ?></strong>: <code>blocs-offres</code>, <code>frequentation</code>, <code>enquetes</code>, <code>entretiens</code>, <code>outils-analytiques</code></p>
+    <p>
+      <label for="geden_offre_badge"><strong><?php esc_html_e('Couleur du picto', 'geden'); ?></strong></label><br>
+      <select id="geden_offre_badge" name="geden_offre_badge">
+        <?php
+        $badges = [
+            'badge-blue' => __('Bleu', 'geden'),
+            'badge-green' => __('Vert', 'geden'),
+            'badge-orange' => __('Orange', 'geden'),
+            'badge-navy' => __('Marine', 'geden'),
+            'badge-teal' => __('Turquoise', 'geden'),
+            'badge-amber' => __('Ambre', 'geden'),
+        ];
+        foreach ($badges as $value => $label) :
+          ?>
+          <option value="<?php echo esc_attr($value); ?>" <?php selected($badge, $value); ?>><?php echo esc_html($label); ?></option>
+        <?php endforeach; ?>
+      </select>
+    </p>
+    <p>
+      <label for="geden_offre_icon"><strong><?php esc_html_e('Icône', 'geden'); ?></strong></label><br>
+      <select id="geden_offre_icon" name="geden_offre_icon">
+        <?php
+        $icons = [
+            'chart' => __('Graphique', 'geden'),
+            'clock' => __('Horloge', 'geden'),
+            'leaf' => __('Feuille', 'geden'),
+            'ruler' => __('Mesure', 'geden'),
+            'shuffle' => __('Flux', 'geden'),
+            'cross' => __('Croisement', 'geden'),
+            'megaphone' => __('Communication', 'geden'),
+            'people' => __('Usagers', 'geden'),
+            'bubble' => __('Perceptions', 'geden'),
+            'check' => __('Réglementation', 'geden'),
+        ];
+        foreach ($icons as $value => $label) :
+          ?>
+          <option value="<?php echo esc_attr($value); ?>" <?php selected($icon, $value); ?>><?php echo esc_html($label); ?></option>
+        <?php endforeach; ?>
+      </select>
+    </p>
+    <p><label for="geden_offre_text"><strong><?php esc_html_e('Texte court (optionnel)', 'geden'); ?></strong></label><br>
+      <input type="text" id="geden_offre_text" name="geden_offre_text" value="<?php echo esc_attr($text); ?>" style="width: 100%;" />
+    </p>
+    <p><label for="geden_offre_lines"><strong><?php esc_html_e('Liste (1 ligne = 1 puce)', 'geden'); ?></strong></label><br>
+      <textarea id="geden_offre_lines" name="geden_offre_lines" rows="5" style="width: 100%;"><?php echo esc_textarea($lines); ?></textarea>
+    </p>
+    <?php
+}
 
 function geden_enjeu_category_add_form_fields(): void
 {
@@ -656,6 +720,13 @@ function geden_save_meta_boxes(int $post_id): void
         update_post_meta($post_id, '_geden_enjeu_lines', sanitize_textarea_field((string) wp_unslash($_POST['geden_enjeu_lines'] ?? '')));
     }
 
+    if (isset($_POST['geden_offre_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['geden_offre_nonce'])), 'geden_save_offre_meta')) {
+        update_post_meta($post_id, '_geden_offre_badge', sanitize_text_field((string) wp_unslash($_POST['geden_offre_badge'] ?? 'badge-blue')));
+        update_post_meta($post_id, '_geden_offre_icon', sanitize_text_field((string) wp_unslash($_POST['geden_offre_icon'] ?? 'chart')));
+        update_post_meta($post_id, '_geden_offre_text', sanitize_text_field((string) wp_unslash($_POST['geden_offre_text'] ?? '')));
+        update_post_meta($post_id, '_geden_offre_lines', sanitize_textarea_field((string) wp_unslash($_POST['geden_offre_lines'] ?? '')));
+    }
+
 }
 add_action('save_post', 'geden_save_meta_boxes');
 
@@ -672,6 +743,16 @@ function geden_get_reference_bullets(string $meta_key, int $post_id): array
 function geden_get_enjeu_lines(int $post_id): array
 {
     $raw = (string) get_post_meta($post_id, '_geden_enjeu_lines', true);
+    if ($raw === '') {
+        return [];
+    }
+    $lines = preg_split('/\r\n|\r|\n/', $raw) ?: [];
+    return array_values(array_filter(array_map('trim', $lines)));
+}
+
+function geden_get_offre_lines(int $post_id): array
+{
+    $raw = (string) get_post_meta($post_id, '_geden_offre_lines', true);
     if ($raw === '') {
         return [];
     }
@@ -760,7 +841,6 @@ function geden_seed_default_terms(): void
             'blocs-permet' => 'Blocs ce que cela permet',
             'blocs-problematiques' => 'Blocs problématiques',
         ],
-        'offre_category' => ['blocs-offres' => 'Blocs offres'],
         'offre_category' => [
             'blocs-offres' => 'Blocs offres',
             'frequentation' => 'Fréquentation',

@@ -45,6 +45,31 @@ La page **Enjeux dynamique** affiche maintenant 3 blocs distincts :
 - Meta box **Options page Problématiques & Enjeux** :
   - sous-titre de page,
   - image / tag / titre / texte pour chacun des 3 héros (Enjeux, Ce que cela permet, Problématiques).
+
+## Mise à jour importante (page Offres & Services)
+La page **Offres & Services (dynamique)** est pilotée par catégories `offre_category` :
+- `blocs-offres`
+- `frequentation`
+- `enquetes`
+- `entretiens`
+- `outils-analytiques`
+
+### Saisie admin (WordPress)
+#### Élément Offres
+- Assigner la catégorie `offre_category` correspondant au bloc visé.
+- Meta box:
+  - Couleur du picto
+  - Icône
+  - Texte court (optionnel)
+  - Liste (1 ligne = 1 puce)
+
+#### Catégorie Offres
+- Chaque catégorie dispose de champs :
+  - Tag affiché
+  - Titre du bloc
+  - Sous-titre du bloc
+  - Image de fond du bloc
+- Des raccourcis de menu sont disponibles dans l’admin pour filtrer rapidement chaque bloc.
 ## Modèles de pages conseillés
 - Présentation -> `Présentation (dynamique)`
 - Problématiques et Enjeux -> `Problématiques & Enjeux (dynamique)`
