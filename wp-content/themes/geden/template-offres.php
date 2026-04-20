@@ -54,6 +54,7 @@ $section_classes = [
     $tag = (string) get_term_meta($term->term_id, '_geden_offre_category_tag', true);
     $title = (string) get_term_meta($term->term_id, '_geden_offre_category_title', true);
     $text = (string) get_term_meta($term->term_id, '_geden_offre_category_subtitle', true);
+    $category_description = term_description($term->term_id, 'offre_category');
     $image_id = (int) get_term_meta($term->term_id, '_geden_offre_category_image_id', true);
     $image_url = $image_id > 0 ? (string) wp_get_attachment_image_url($image_id, 'full') : '';
     $tag = $tag !== '' ? $tag : $term->name;
@@ -91,7 +92,13 @@ $section_classes = [
       <?php endif; ?>
 
       <?php if (!$items->have_posts()) : ?>
-        <p class="ref-empty">Aucun bloc trouvé pour la catégorie <code><?php echo esc_html($term->slug); ?></code>.</p>
+        <?php if ($category_description !== '' && $term->slug !== 'blocs-offres' && $term->slug !== 'outils-analytiques') : ?>
+          <article class="service-content">
+            <?php echo wp_kses_post(wpautop($category_description)); ?>
+          </article>
+        <?php else : ?>
+          <p class="ref-empty">Aucun bloc trouvé pour la catégorie <code><?php echo esc_html($term->slug); ?></code>.</p>
+        <?php endif; ?>
       <?php endif; ?>
 
       <?php

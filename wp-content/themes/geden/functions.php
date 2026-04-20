@@ -666,6 +666,16 @@ function geden_save_offre_category_meta(int $term_id): void
 add_action('created_offre_category', 'geden_save_offre_category_meta');
 add_action('edited_offre_category', 'geden_save_offre_category_meta');
 
+function geden_save_offre_category_meta(int $term_id): void
+{
+    update_term_meta($term_id, '_geden_offre_category_tag', sanitize_text_field((string) wp_unslash($_POST['geden_offre_category_tag'] ?? '')));
+    update_term_meta($term_id, '_geden_offre_category_title', sanitize_text_field((string) wp_unslash($_POST['geden_offre_category_title'] ?? '')));
+    update_term_meta($term_id, '_geden_offre_category_subtitle', sanitize_textarea_field((string) wp_unslash($_POST['geden_offre_category_subtitle'] ?? '')));
+    update_term_meta($term_id, '_geden_offre_category_image_id', absint($_POST['geden_offre_category_image_id'] ?? 0));
+}
+add_action('created_offre_category', 'geden_save_offre_category_meta');
+add_action('edited_offre_category', 'geden_save_offre_category_meta');
+
 function geden_save_meta_boxes(int $post_id): void
 {
     if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
@@ -871,7 +881,7 @@ function geden_register_admin_shortcuts(): void
     add_submenu_page('edit.php?post_type=geden_enjeu', 'Blocs Ce que cela permet', 'Blocs Ce que cela permet', 'edit_posts', 'edit.php?post_type=geden_enjeu&enjeu_category=blocs-permet');
     add_submenu_page('edit.php?post_type=geden_enjeu', 'Blocs Problématiques', 'Blocs Problématiques', 'edit_posts', 'edit.php?post_type=geden_enjeu&enjeu_category=blocs-problematiques');
     add_submenu_page('edit.php?post_type=geden_offre', 'Blocs Offres', 'Blocs Offres', 'edit_posts', 'edit.php?post_type=geden_offre&offre_category=blocs-offres');
-    add_submenu_page('edit.php?post_type=geden_offre', 'Fréquentation', 'Fréquentation', 'edit_posts', 'edit.php?post_type=geden_offre&offre_category=frequentation');
+        add_submenu_page('edit.php?post_type=geden_offre', 'Fréquentation', 'Fréquentation', 'edit_posts', 'edit.php?post_type=geden_offre&offre_category=frequentation');
     add_submenu_page('edit.php?post_type=geden_offre', 'Enquêtes', 'Enquêtes', 'edit_posts', 'edit.php?post_type=geden_offre&offre_category=enquetes');
     add_submenu_page('edit.php?post_type=geden_offre', 'Entretiens', 'Entretiens', 'edit_posts', 'edit.php?post_type=geden_offre&offre_category=entretiens');
     add_submenu_page('edit.php?post_type=geden_offre', 'Outils analytiques', 'Outils analytiques', 'edit_posts', 'edit.php?post_type=geden_offre&offre_category=outils-analytiques');
