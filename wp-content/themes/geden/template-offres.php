@@ -99,7 +99,6 @@ $section_classes = [
       <?php if (!$items->have_posts()) : ?>
         <p class="ref-empty">Aucun bloc trouvé pour la catégorie <code><?php echo esc_html($term->slug); ?></code>.</p>
       <?php endif; ?>
-      <?php
        <?php if ($term->slug === 'blocs-offres') : ?>
           <article class="services-card">
             <h3><?php the_title(); ?></h3>
