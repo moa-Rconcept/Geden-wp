@@ -7,6 +7,11 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+require_once get_template_directory() . '/inc/taxonomies/reference.php';
+require_once get_template_directory() . '/inc/taxonomies/presentation.php';
+require_once get_template_directory() . '/inc/taxonomies/enjeu.php';
+require_once get_template_directory() . '/inc/taxonomies/offre.php';
+
 function geden_theme_setup(): void
 {
     add_theme_support('title-tag');
@@ -46,8 +51,7 @@ function geden_enqueue_assets(): void
         '3.7.1',
         true
     );
-    wp_enqueue_script('jquery');    
-    wp_enqueue_script('geden-main', get_template_directory_uri() . '/main.js', ['jquery'], wp_get_theme()->get('Version'), true);
+    wp_enqueue_script('jquery');    wp_enqueue_script('geden-main', get_template_directory_uri() . '/main.js', ['jquery'], wp_get_theme()->get('Version'), true);
 
     if (is_page_template('template-contact.php')) {
         wp_enqueue_script('geden-formulaire', get_template_directory_uri() . '/formulaire.js', ['jquery'], wp_get_theme()->get('Version'), true);
@@ -67,12 +71,12 @@ function geden_admin_enqueue_media_for_references(string $hook): void
     }
 
      if (in_array($hook, ['post.php', 'post-new.php'], true) && $screen->post_type === 'geden_reference') {
-        wp_enqueue_media();
+        wp_enqueue_media('jquery');
         return;
     }
 
     if (in_array($hook, ['edit-tags.php', 'term.php'], true) && in_array($screen->taxonomy, ['enjeu_category', 'offre_category'], true)) {
-        wp_enqueue_media();
+        wp_enqueue_media('jquery');
     }
 }
 add_action('admin_enqueue_scripts', 'geden_admin_enqueue_media_for_references');
@@ -197,8 +201,8 @@ function geden_reference_meta_box(WP_Post $post): void
     $needs = (string) get_post_meta($post->ID, '_geden_reference_needs', true);
     $services = (string) get_post_meta($post->ID, '_geden_reference_services', true);
     $authors = (string) get_post_meta($post->ID, '_geden_reference_authors', true);
+    $deliverable = (string) get_post_meta($post->ID, '_geden_reference_deliverable', true);
    $saved_logos = geden_get_reference_sponsor_logos($post->ID);
-   $deliverable = (string) get_post_meta($post->ID, '_geden_reference_deliverable', true);
     if (empty($saved_logos)) {
         $saved_logos = [['name' => '', 'url' => '', 'image_id' => 0]];
     }
@@ -434,7 +438,7 @@ function geden_offre_meta_box(WP_Post $post): void
         <?php endforeach; ?>
       </select>
     </p>
-    <p><label for="geden_offre_text"><strong><?php esc_html_e('Texte court (optionnel)', 'geden'); ?></strong></label><br>
+        <p><label for="geden_offre_text"><strong><?php esc_html_e('Texte court (optionnel)', 'geden'); ?></strong></label><br>
       <input type="text" id="geden_offre_text" name="geden_offre_text" value="<?php echo esc_attr($text); ?>" style="width: 100%;" />
     </p>
     <p><label for="geden_offre_lines"><strong><?php esc_html_e('Liste (1 ligne = 1 puce)', 'geden'); ?></strong></label><br>
@@ -442,6 +446,7 @@ function geden_offre_meta_box(WP_Post $post): void
     </p>
     <?php
 }
+
 
 function geden_enjeu_category_add_form_fields(): void
 {
@@ -677,8 +682,7 @@ function geden_save_meta_boxes(int $post_id): void
         return;
     }
 
-    if (isset($_POST['geden_reference_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['geden_reference_nonce'])), 'geden_save_reference_meta'))
-      {
+    if (isset($_POST['geden_reference_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['geden_reference_nonce'])), 'geden_save_reference_meta')) {
         update_post_meta($post_id, '_geden_reference_year', sanitize_text_field((string) wp_unslash($_POST['geden_reference_year'] ?? '')));
         update_post_meta($post_id, '_geden_reference_client', sanitize_text_field((string) wp_unslash($_POST['geden_reference_client'] ?? '')));
         update_post_meta($post_id, '_geden_reference_link', esc_url_raw((string) wp_unslash($_POST['geden_reference_link'] ?? '')));
@@ -700,8 +704,7 @@ function geden_save_meta_boxes(int $post_id): void
             }
             $logos[] = ['name' => $name, 'url' => $url, 'image_id' => $image_id];
         }
-        update_post_meta($post_id, '_geden_reference_sponsor_logos', wp_json_encode($logos));    
-      }
+        update_post_meta($post_id, '_geden_reference_sponsor_logos', wp_json_encode($logos));    }
 
     if (isset($_POST['geden_sponsor_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['geden_sponsor_nonce'])), 'geden_save_sponsor_meta')) {
         $website = isset($_POST['geden_sponsor_website']) ? esc_url_raw(wp_unslash($_POST['geden_sponsor_website'])) : '';
@@ -834,24 +837,10 @@ function geden_get_reference_sponsor_logos(int $post_id): array
 function geden_seed_default_terms(): void
 {
     $default_terms = [
-        'reference_category' => [
-            'realisations-effectuees' => 'Réalisations effectuées',
-            'realisations-en-cours' => 'Réalisations en cours',
-            'productions-techniques-scientifiques' => 'Productions techniques et scientifiques',
-        ],
-        'presentation_category' => ['blocs-presentation' => 'Blocs présentation'],
-        'enjeu_category' => [
-            'blocs-enjeux' => 'Blocs enjeux',
-            'blocs-permet' => 'Blocs ce que cela permet',
-            'blocs-problematiques' => 'Blocs problématiques',
-        ],
-        'offre_category' => [
-            'blocs-offres' => 'Blocs offres',
-            'frequentation' => 'Fréquentation',
-            'enquetes' => 'Enquêtes',
-            'entretiens' => 'Entretiens',
-            'outils-analytiques' => 'Outils analytiques',
-        ],
+        'reference_category' => geden_reference_default_terms(),
+        'presentation_category' => geden_presentation_default_terms(),
+        'enjeu_category' => geden_enjeu_default_terms(),
+        'offre_category' => geden_offre_default_terms(),
     ];
 
     foreach ($default_terms as $taxonomy => $terms) {
@@ -866,18 +855,20 @@ add_action('init', 'geden_seed_default_terms', 20);
 
 function geden_register_admin_shortcuts(): void
 {
-    add_submenu_page('edit.php?post_type=geden_reference', 'Réalisations en cours', 'Réalisations en cours', 'edit_posts', 'edit.php?post_type=geden_reference&reference_category=realisations-en-cours');
-    add_submenu_page('edit.php?post_type=geden_reference', 'Réalisations effectuées', 'Réalisations effectuées', 'edit_posts', 'edit.php?post_type=geden_reference&reference_category=realisations-effectuees');
-    add_submenu_page('edit.php?post_type=geden_reference', 'Productions', 'Productions', 'edit_posts', 'edit.php?post_type=geden_reference&reference_category=productions-techniques-scientifiques');
+    foreach (geden_reference_admin_shortcuts() as [$page_title, $menu_title, $slug]) {
+        add_submenu_page('edit.php?post_type=geden_reference', $page_title, $menu_title, 'edit_posts', $slug);
+    }
 
-    add_submenu_page('edit.php?post_type=geden_presentation', 'Blocs Présentation', 'Blocs Présentation', 'edit_posts', 'edit.php?post_type=geden_presentation&presentation_category=blocs-presentation');
-    add_submenu_page('edit.php?post_type=geden_enjeu', 'Blocs Enjeux', 'Blocs Enjeux', 'edit_posts', 'edit.php?post_type=geden_enjeu&enjeu_category=blocs-enjeux');
-    add_submenu_page('edit.php?post_type=geden_enjeu', 'Blocs Ce que cela permet', 'Blocs Ce que cela permet', 'edit_posts', 'edit.php?post_type=geden_enjeu&enjeu_category=blocs-permet');
-    add_submenu_page('edit.php?post_type=geden_enjeu', 'Blocs Problématiques', 'Blocs Problématiques', 'edit_posts', 'edit.php?post_type=geden_enjeu&enjeu_category=blocs-problematiques');
-    add_submenu_page('edit.php?post_type=geden_offre', 'Blocs Offres', 'Blocs Offres', 'edit_posts', 'edit.php?post_type=geden_offre&offre_category=blocs-offres');
-        add_submenu_page('edit.php?post_type=geden_offre', 'Fréquentation', 'Fréquentation', 'edit_posts', 'edit.php?post_type=geden_offre&offre_category=frequentation');
-    add_submenu_page('edit.php?post_type=geden_offre', 'Enquêtes', 'Enquêtes', 'edit_posts', 'edit.php?post_type=geden_offre&offre_category=enquetes');
-    add_submenu_page('edit.php?post_type=geden_offre', 'Entretiens', 'Entretiens', 'edit_posts', 'edit.php?post_type=geden_offre&offre_category=entretiens');
-    add_submenu_page('edit.php?post_type=geden_offre', 'Outils analytiques', 'Outils analytiques', 'edit_posts', 'edit.php?post_type=geden_offre&offre_category=outils-analytiques');
+    foreach (geden_presentation_admin_shortcuts() as [$page_title, $menu_title, $slug]) {
+        add_submenu_page('edit.php?post_type=geden_presentation', $page_title, $menu_title, 'edit_posts', $slug);
+    }
+
+    foreach (geden_enjeu_admin_shortcuts() as [$page_title, $menu_title, $slug]) {
+        add_submenu_page('edit.php?post_type=geden_enjeu', $page_title, $menu_title, 'edit_posts', $slug);
+    }
+
+    foreach (geden_offre_admin_shortcuts() as [$page_title, $menu_title, $slug]) {
+        add_submenu_page('edit.php?post_type=geden_offre', $page_title, $menu_title, 'edit_posts', $slug);
+    }
 }
 add_action('admin_menu', 'geden_register_admin_shortcuts');
