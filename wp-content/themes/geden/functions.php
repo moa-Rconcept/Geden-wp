@@ -747,6 +747,54 @@ function geden_save_offre_category_meta(int $term_id): void
 add_action('created_offre_category', 'geden_save_offre_category_meta');
 add_action('edited_offre_category', 'geden_save_offre_category_meta');
 
+function geden_enable_rich_editor_for_offre_category_description(string $hook): void
+{
+    if (!in_array($hook, ['edit-tags.php', 'term.php'], true)) {
+        return;
+    }
+
+    $taxonomy = (string) ($_GET['taxonomy'] ?? '');
+    if ($taxonomy !== 'offre_category') {
+        return;
+    }
+
+    wp_enqueue_editor();
+}
+add_action('admin_enqueue_scripts', 'geden_enable_rich_editor_for_offre_category_description');
+
+function geden_init_offre_category_description_editor(): void
+{
+    $screen = get_current_screen();
+    if (!$screen || $screen->taxonomy !== 'offre_category' || !in_array($screen->base, ['edit-tags', 'term'], true)) {
+        return;
+    }
+    ?>
+    <script>
+      (function($){
+        const isEditScreen = $('body').hasClass('term-php');
+        const textareaId = isEditScreen ? 'description' : 'tag-description';
+        const textarea = document.getElementById(textareaId);
+        if (!textarea || !window.wp || !wp.editor || !wp.editor.initialize) {
+          return;
+        }
+
+        wp.editor.initialize(textareaId, {
+          tinymce: {
+            wpautop: true,
+            toolbar1: 'formatselect,bold,italic,link,unlink,bullist,numlist,blockquote,undo,redo',
+            toolbar2: ''
+          },
+          quicktags: true,
+          mediaButtons: false
+        });
+      })(jQuery);
+    </script>
+    <?php
+}
+add_action('admin_footer-edit-tags.php', 'geden_init_offre_category_description_editor');
+add_action('admin_footer-term.php', 'geden_init_offre_category_description_editor');
+
+
 function geden_save_meta_boxes(int $post_id): void
 {
     if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
