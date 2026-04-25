@@ -344,7 +344,7 @@ footer {
 /* Grid 2 colonnes (générique pages) */
 .grid-2 {
   display: grid;
-  gap: 24px;
+  gap: 45px;
   justify-content: space-between;
 }
 
@@ -1735,6 +1735,18 @@ section.section.problematiques {
   .form-field--full { grid-column: 1 / -1; }
 
   .team-grid { grid-template-columns: repeat(2, 1fr); }
+
+  .presentation-card__grid {
+    grid-template-columns: 1.7fr 1fr;
+    align-items: start;
+  }
+  .presentation-card--split-media-right .presentation-card__grid {
+    grid-template-columns: 1fr 1.7fr;
+  }
+  .presentation-card--text-only .presentation-card__grid,
+  .presentation-card--quote .presentation-card__grid {
+    grid-template-columns: 1fr;
+  }
 
   .linkband {
     flex-direction: row;
