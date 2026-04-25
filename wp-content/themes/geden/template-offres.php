@@ -57,11 +57,21 @@ $section_classes = [
 
     $category_description = trim((string) term_description($term->term_id, 'offre_category'));
 
-    $image_url = trim((string) get_term_meta(
-        $term->term_id,
-        '_geden_offre_category_image',
-        true
-    ));
+   $image_url = '';
+
+    $image_id = (int) get_term_meta($term->term_id, '_geden_offre_category_image_id', true);
+
+    if ($image_id > 0) {
+        $image_url = (string) wp_get_attachment_image_url($image_id, 'full');
+    }
+
+    if ($image_url === '') {
+        $image_meta = trim((string) get_term_meta($term->term_id, '_geden_offre_category_image', true));
+
+        if ($image_meta !== '') {
+            $image_url = esc_url($image_meta);
+        }
+    }
 
     if ($title === '') {
         $title = $term->name;
