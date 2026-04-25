@@ -1531,6 +1531,7 @@ section.section.problematiques {
 .team-grid {
   display: grid;
   gap: 24px;
+  margin-top: 24px;
 }
 
 .team-card {
