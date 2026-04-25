@@ -60,7 +60,7 @@ $team_members = new WP_Query([
         'orderby' => ['menu_order' => 'ASC', 'date' => 'ASC'],
     ]);
     ?>
-    <section class="section">
+    
       <?php
        while ($items->have_posts()) : $items->the_post();
           $post_id = get_the_ID();
@@ -73,17 +73,19 @@ $team_members = new WP_Query([
       <?php if ($label !== '') : ?>
         <p class="presentation-card__label"><?php echo esc_html($label); ?></p>
       <?php endif; ?>
-      <div class="presentation-card__grid grid-2">
-        <?php if (has_post_thumbnail()) : ?>
-          <figure class="presentation-card__media">
-            <?php the_post_thumbnail('large'); ?>
-          </figure>
-        <?php endif; ?>
-        <div class="presentation-card__content">
-          <h2><?php the_title(); ?></h2>
-          <?php the_content(); ?>
+      <section class="section">
+        <div class="presentation-card__grid grid-2">
+          <?php if (has_post_thumbnail()) : ?>
+            <figure class="presentation-card__media">
+              <?php the_post_thumbnail('large'); ?>
+            </figure>
+          <?php endif; ?>
+          <div class="presentation-card__content">
+            <h2><?php the_title(); ?></h2>
+            <?php the_content(); ?>
+          </div>
         </div>
-      </div>
+      </section>
       <?php endwhile; wp_reset_postdata(); ?>
       <?php endforeach; ?>
 
