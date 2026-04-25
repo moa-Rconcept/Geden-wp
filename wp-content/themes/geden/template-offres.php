@@ -51,14 +51,14 @@ $section_classes = [
         continue;
     }
 
-    $tag = (string) get_term_meta($term->term_id, '_geden_offre_category_tag', true);
-    $title = (string) get_term_meta($term->term_id, '_geden_offre_category_title', true);
-    $text = (string) get_term_meta($term->term_id, '_geden_offre_category_subtitle', true);
-    $category_description = term_description($term->term_id, 'offre_category');
-    $image_id = (int) get_term_meta($term->term_id, '_geden_offre_category_image_id', true);
-    $image_url = $image_id > 0 ? (string) wp_get_attachment_image_url($image_id, 'full') : '';
-    $tag = $tag !== '' ? $tag : $term->name;
-    $title = $title !== '' ? $title : $term->name;
+$tag = trim((string) get_term_meta($term->term_id, '_geden_offre_category_tag', true));
+$title = trim((string) get_term_meta($term->term_id, '_geden_offre_category_title', true));
+$text = trim((string) get_term_meta($term->term_id, '_geden_offre_category_subtitle', true));
+$category_description = trim((string) term_description($term->term_id, 'offre_category'));
+
+if ($title === '') {
+    $title = $term->name;
+}
 
     $items = new WP_Query([
         'post_type' => 'geden_offre',
@@ -77,9 +77,13 @@ $section_classes = [
       <article class="services-hero<?php echo $term->slug === 'blocs-offres' ? '' : ' services-hero--small'; ?>"<?php echo $image_url !== '' ? " style=\"background-image:url('" . esc_url($image_url) . "')\"" : ''; ?>>
         <div class="services-hero__bg"></div>
         <div class="services-hero__inner">
+        <?php if ($tag !== '') : ?>
           <span class="services-hero__tag"><?php echo esc_html($tag); ?></span>
+        <?php endif; ?>
           <h2 class="services-hero__title"><?php echo esc_html($title); ?></h2>
-          <?php if ($text !== '') : ?><p class="services-hero__lede"><?php echo esc_html($text); ?></p><?php endif; ?>
+          <?php if ($text !== '') : ?>
+            <p class="services-hero__lede"><?php echo esc_html($text); ?></p>
+          <?php endif; ?>
         </div>
       </article>
 
