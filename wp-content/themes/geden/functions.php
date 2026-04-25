@@ -9,6 +9,7 @@ if (!defined('ABSPATH')) {
 
 require_once get_template_directory() . '/inc/taxonomies/reference.php';
 require_once get_template_directory() . '/inc/taxonomies/presentation.php';
+require_once get_template_directory() . '/inc/taxonomies/team.php';
 require_once get_template_directory() . '/inc/taxonomies/enjeu.php';
 require_once get_template_directory() . '/inc/taxonomies/offre.php';
 
@@ -32,8 +33,8 @@ add_action('after_setup_theme', 'geden_theme_setup');
 
 function geden_disable_block_editor_for_custom_content(bool $use_block_editor, string $post_type): bool
 {
-    if (in_array($post_type, ['geden_reference', 'geden_sponsor', 'geden_enjeu', 'geden_offre'], true)) {
-        return false;
+    if (in_array($post_type, ['geden_reference', 'geden_sponsor', 'geden_enjeu', 'geden_offre', 'geden_team'], true)) {
+              return false;
     }
 
     return $use_block_editor;
@@ -122,6 +123,19 @@ function geden_register_content_types(): void
         'rewrite' => ['slug' => 'presentation-item'],
     ]);
 
+     register_post_type('geden_team', [
+        'labels' => [
+            'name' => __('Équipe', 'geden'),
+            'singular_name' => __('Membre d\'équipe', 'geden'),
+            'add_new_item' => __('Ajouter un membre', 'geden'),
+        ],
+        'public' => true,
+        'menu_icon' => 'dashicons-groups',
+        'supports' => ['title', 'editor', 'thumbnail', 'excerpt', 'page-attributes'],
+        'show_in_rest' => true,
+        'rewrite' => ['slug' => 'equipe-item'],
+    ]);
+
     register_post_type('geden_enjeu', [
         'labels' => [
             'name' => __('Enjeux', 'geden'),
@@ -165,6 +179,13 @@ function geden_register_content_types(): void
         'show_in_rest' => true,
     ]);
 
+     register_taxonomy('team_category', ['geden_team'], [
+        'labels' => ['name' => __('Catégories Équipe', 'geden')],
+        'public' => true,
+        'hierarchical' => true,
+        'show_in_rest' => true,
+    ]);
+
     register_taxonomy('enjeu_category', ['geden_enjeu'], [
         'labels' => ['name' => __('Catégories Enjeux', 'geden')],
         'public' => true,
@@ -185,6 +206,8 @@ function geden_register_meta_boxes(): void
 {
     add_meta_box('geden_reference_infos', __('Bloc Référence (format identique)', 'geden'), 'geden_reference_meta_box', 'geden_reference', 'normal', 'high');
     add_meta_box('geden_sponsor_infos', __('Infos sponsor', 'geden'), 'geden_sponsor_meta_box', 'geden_sponsor', 'normal', 'default');
+    add_meta_box('geden_presentation_infos', __('Bloc Présentation', 'geden'), 'geden_presentation_meta_box', 'geden_presentation', 'normal', 'high');
+    add_meta_box('geden_team_infos', __('Membre équipe', 'geden'), 'geden_team_meta_box', 'geden_team', 'normal', 'high');
     add_meta_box('geden_enjeu_infos', __('Bloc Enjeu / Problématique', 'geden'), 'geden_enjeu_meta_box', 'geden_enjeu', 'normal', 'high');
     add_meta_box('geden_offre_infos', __('Bloc Offre / Service', 'geden'), 'geden_offre_meta_box', 'geden_offre', 'normal', 'high');
     add_meta_box('geden_references_page_options', __('Options page Références', 'geden'), 'geden_references_page_options_meta_box', 'page', 'normal', 'high');
@@ -447,6 +470,57 @@ function geden_offre_meta_box(WP_Post $post): void
     <?php
 }
 
+function geden_presentation_meta_box(WP_Post $post): void
+{
+    wp_nonce_field('geden_save_presentation_meta', 'geden_presentation_nonce');
+    $layout = (string) get_post_meta($post->ID, '_geden_presentation_layout', true);
+    $button_label = (string) get_post_meta($post->ID, '_geden_presentation_button_label', true);
+    if ($layout === '') {
+        $layout = 'split-media-left';
+    }
+    ?>
+    <p><strong><?php esc_html_e('Astuce catégorie', 'geden'); ?></strong>: <code>blocs-presentation</code>, <code>blocs-valeurs</code></p>
+    <p>
+      <label for="geden_presentation_layout"><strong><?php esc_html_e('Type de bloc', 'geden'); ?></strong></label><br>
+      <select id="geden_presentation_layout" name="geden_presentation_layout">
+        <?php
+        $layouts = [
+            'split-media-left' => __('Texte + image (image à gauche)', 'geden'),
+            'split-media-right' => __('Texte + image (image à droite)', 'geden'),
+            'text-only' => __('Texte seul', 'geden'),
+            'quote' => __('Citation / mise en avant', 'geden'),
+        ];
+        foreach ($layouts as $value => $label) :
+        ?>
+          <option value="<?php echo esc_attr($value); ?>" <?php selected($layout, $value); ?>><?php echo esc_html($label); ?></option>
+        <?php endforeach; ?>
+      </select>
+    </p>
+    <p>
+      <label for="geden_presentation_button_label"><strong><?php esc_html_e('Label de pastille (optionnel)', 'geden'); ?></strong></label><br>
+      <input type="text" id="geden_presentation_button_label" name="geden_presentation_button_label" value="<?php echo esc_attr($button_label); ?>" style="width: 100%;" placeholder="<?php esc_attr_e('Ex: Nos valeurs', 'geden'); ?>" />
+    </p>
+    <?php
+}
+
+function geden_team_meta_box(WP_Post $post): void
+{
+    wp_nonce_field('geden_save_team_meta', 'geden_team_nonce');
+    $role = (string) get_post_meta($post->ID, '_geden_team_role', true);
+    $modal_title = (string) get_post_meta($post->ID, '_geden_team_modal_title', true);
+    ?>
+    <p><strong><?php esc_html_e('Astuce catégorie', 'geden'); ?></strong>: <code>membres-equipe</code></p>
+    <p>
+      <label for="geden_team_role"><strong><?php esc_html_e('Rôle affiché sur la carte', 'geden'); ?></strong></label><br>
+      <input type="text" id="geden_team_role" name="geden_team_role" value="<?php echo esc_attr($role); ?>" style="width: 100%;" />
+    </p>
+    <p>
+      <label for="geden_team_modal_title"><strong><?php esc_html_e('Titre secondaire modal (optionnel)', 'geden'); ?></strong></label><br>
+      <input type="text" id="geden_team_modal_title" name="geden_team_modal_title" value="<?php echo esc_attr($modal_title); ?>" style="width: 100%;" placeholder="<?php esc_attr_e('Ex: Expertise / Spécialité', 'geden'); ?>" />
+    </p>
+    <p><?php esc_html_e('Le contenu principal de la modale est le contenu de l’éditeur du membre.', 'geden'); ?></p>
+    <?php
+}
 
 function geden_enjeu_category_add_form_fields(): void
 {
@@ -711,6 +785,16 @@ function geden_save_meta_boxes(int $post_id): void
         update_post_meta($post_id, '_geden_sponsor_website', $website);
     }
 
+    if (isset($_POST['geden_presentation_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['geden_presentation_nonce'])), 'geden_save_presentation_meta')) {
+        update_post_meta($post_id, '_geden_presentation_layout', sanitize_text_field((string) wp_unslash($_POST['geden_presentation_layout'] ?? 'split-media-left')));
+        update_post_meta($post_id, '_geden_presentation_button_label', sanitize_text_field((string) wp_unslash($_POST['geden_presentation_button_label'] ?? '')));
+    }
+
+    if (isset($_POST['geden_team_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['geden_team_nonce'])), 'geden_save_team_meta')) {
+        update_post_meta($post_id, '_geden_team_role', sanitize_text_field((string) wp_unslash($_POST['geden_team_role'] ?? '')));
+        update_post_meta($post_id, '_geden_team_modal_title', sanitize_text_field((string) wp_unslash($_POST['geden_team_modal_title'] ?? '')));
+    }
+
     if (isset($_POST['geden_references_page_options_nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['geden_references_page_options_nonce'])), 'geden_save_references_page_options')) {
         update_post_meta($post_id, '_geden_references_banner_image_id', absint(wp_unslash($_POST['geden_references_banner_image_id'] ?? 0)));
         update_post_meta($post_id, '_geden_references_hero_image_id', absint(wp_unslash($_POST['geden_references_hero_image_id'] ?? 0)));
@@ -839,6 +923,7 @@ function geden_seed_default_terms(): void
     $default_terms = [
         'reference_category' => geden_reference_default_terms(),
         'presentation_category' => geden_presentation_default_terms(),
+        'team_category' => geden_team_default_terms(),
         'enjeu_category' => geden_enjeu_default_terms(),
         'offre_category' => geden_offre_default_terms(),
     ];
@@ -861,6 +946,10 @@ function geden_register_admin_shortcuts(): void
 
     foreach (geden_presentation_admin_shortcuts() as [$page_title, $menu_title, $slug]) {
         add_submenu_page('edit.php?post_type=geden_presentation', $page_title, $menu_title, 'edit_posts', $slug);
+    }
+
+     foreach (geden_team_admin_shortcuts() as [$page_title, $menu_title, $slug]) {
+        add_submenu_page('edit.php?post_type=geden_team', $page_title, $menu_title, 'edit_posts', $slug);
     }
 
     foreach (geden_enjeu_admin_shortcuts() as [$page_title, $menu_title, $slug]) {
