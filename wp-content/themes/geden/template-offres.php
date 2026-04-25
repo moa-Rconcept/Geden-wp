@@ -51,36 +51,30 @@ $section_classes = [
         continue;
     }
 
-$tag   = trim((string) get_term_meta($term->term_id, '_geden_offre_category_tag', true));
-$title = trim((string) get_term_meta($term->term_id, '_geden_offre_category_title', true));
-$text  = trim((string) get_term_meta($term->term_id, '_geden_offre_category_subtitle', true));
+    $tag   = trim((string) get_term_meta($term->term_id, '_geden_offre_category_tag', true));
+    $title = trim((string) get_term_meta($term->term_id, '_geden_offre_category_title', true));
+    $text  = trim((string) get_term_meta($term->term_id, '_geden_offre_category_subtitle', true));
 
-$category_description = trim((string) term_description($term->term_id, 'offre_category'));
+    $category_description = trim((string) term_description($term->term_id, 'offre_category'));
 
-$image_url = '';
-$image_meta = get_term_meta($term->term_id, '_geden_offre_category_image', true);
+    $image_url = trim((string) get_term_meta(
+        $term->term_id,
+        '_geden_offre_category_image',
+        true
+    ));
 
-if (!empty($image_meta)) {
-    if (is_numeric($image_meta)) {
-        $img = wp_get_attachment_image_url((int) $image_meta, 'full');
-        $image_url = $img ? $img : '';
-    } else {
-        $image_url = esc_url((string) $image_meta);
+    if ($title === '') {
+        $title = $term->name;
     }
-}
-
-if ($title === '') {
-    $title = $term->name;
-}
     $items = new WP_Query([
-        'post_type' => 'geden_offre',
-        'posts_per_page' => -1,
-        'tax_query' => [[
-            'taxonomy' => 'offre_category',
-            'field' => 'slug',
-            'terms' => $term->slug,
-        ]],
-        'orderby' => ['menu_order' => 'ASC', 'date' => 'ASC'],
+      'post_type' => 'geden_offre',
+      'posts_per_page' => -1,
+      'tax_query' => [[
+          'taxonomy' => 'offre_category',
+          'field' => 'slug',
+          'terms' => $term->slug,
+      ]],
+      'orderby' => ['menu_order' => 'ASC', 'date' => 'ASC'],
     ]);
 
     $section_class = $section_classes[$term->slug] ?? 'section section-service-block';
