@@ -70,22 +70,20 @@ $team_members = new WP_Query([
               $layout = 'split-media-left';
           }
       ?>
-      <article class="grid-2 card presentation-card presentation-card--<?php echo esc_attr($layout); ?>">
-          <?php if ($label !== '') : ?>
-            <p class="presentation-card__label"><?php echo esc_html($label); ?></p>
-          <?php endif; ?>
-          <div class="presentation-card__grid">
-            <?php if (has_post_thumbnail()) : ?>
-              <figure class="presentation-card__media">
-                <?php the_post_thumbnail('large'); ?>
-              </figure>
-            <?php endif; ?>
-            <div class="presentation-card__content">
-              <h2><?php the_title(); ?></h2>
-              <?php the_content(); ?>
-            </div>
-          </div>
-        </article>
+      <?php if ($label !== '') : ?>
+        <p class="presentation-card__label"><?php echo esc_html($label); ?></p>
+      <?php endif; ?>
+      <div class="presentation-card__grid grid-2">
+        <?php if (has_post_thumbnail()) : ?>
+          <figure class="presentation-card__media">
+            <?php the_post_thumbnail('large'); ?>
+          </figure>
+        <?php endif; ?>
+        <div class="presentation-card__content">
+          <h2><?php the_title(); ?></h2>
+          <?php the_content(); ?>
+        </div>
+      </div>
       <?php endwhile; wp_reset_postdata(); ?>
       <?php endforeach; ?>
 
