@@ -35,7 +35,7 @@ $team_members = new WP_Query([
   </div>
 </section>
 
-<main class="container">
+  <main class="container" style="padding:40px 0 64px">
   <?php while (have_posts()) : the_post(); ?>
     <?php if (trim((string) get_the_content()) !== '') : ?>
       <section class="section">
@@ -70,7 +70,7 @@ $team_members = new WP_Query([
               $layout = 'split-media-left';
           }
       ?>
-      <article class="card presentation-card presentation-card--<?php echo esc_attr($layout); ?>">
+      <article class="grid-2 card presentation-card presentation-card--<?php echo esc_attr($layout); ?>">
           <?php if ($label !== '') : ?>
             <p class="presentation-card__label"><?php echo esc_html($label); ?></p>
           <?php endif; ?>
@@ -89,6 +89,8 @@ $team_members = new WP_Query([
       <?php endwhile; wp_reset_postdata(); ?>
       <?php endforeach; ?>
 
+
+      <!-- Equipe -->
   <?php if ($team_members->have_posts()) : ?>
     <section class="section">
       <p class="presentation-card__label"><?php esc_html_e('Notre équipe', 'geden'); ?></p>
