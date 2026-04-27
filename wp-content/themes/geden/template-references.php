@@ -259,6 +259,8 @@ if ($hero_subtitle === '') {
         <?php
       endif;
 
+      krsort($grouped, SORT_NUMERIC);
+
       $is_first = true;
       foreach ($grouped as $year => $items) :
         ?>
