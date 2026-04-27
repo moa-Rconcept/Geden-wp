@@ -19,7 +19,7 @@ get_header();
   </div>
 </section>
 
-<section class="white">
+<!-- <section class="white">
   <div class="container">
     <?php
     while (have_posts()) :
@@ -28,7 +28,133 @@ get_header();
     endwhile;
     ?>
   </div>
-</section>
+</section> -->
+
+  <!-- 1 - Notre Mission -->
+  <section class="white">
+    <div class="container">
+      <h2>Notre mission</h2>
+      <p class="lead">
+        Spécialisé dans l'étude des socio-écosystèmes, GeDEN propose des moyens et méthodes
+        pour suivre et évaluer les usages dans les espaces naturels et leurs effets sur la biodiversité.
+      </p>
+    </div>
+  </section>
+
+  <!-- 2 - Nos objectifs -->
+  <section class="white compact">
+    <div class="container">
+      <h2>Nos objectifs</h2>
+      <div class="goals mt-3">
+        <div class="goal"><span class="tick">✔</span><span>Quantifier les pressions, les impacts et déterminer la capacité de charge des sites</span></div>
+        <div class="goal"><span class="tick">✔</span><span>Anticiper les reports de fréquentation et limiter les conflits</span></div>
+        <div class="goal"><span class="tick">✔</span><span>Optimiser l’aménagement et la surveillance des sites</span></div>
+        <div class="goal"><span class="tick">✔</span><span>Adapter la communication et la sensibilisation des publics</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 - Nos méthodes -->
+   <section class="gradient section-method">
+    <div class="container">
+      <div class="section-head">
+        <h2>Notre méthode en 4 étapes</h2>
+        <p class="lead">Une approche structurée pour passer de la donnée terrain à un plan d'action priorisé.</p>
+      </div>
+
+      <div class="process-flow" aria-label="Étapes de la méthode GeDEN">
+        <article class="process-step">
+          <span>1</span>
+          <h3>Cadrage</h3>
+          <p>Définition des enjeux, des publics et des indicateurs clés avec vos équipes.</p>
+        </article>
+        <article class="process-step">
+          <span>2</span>
+          <h3>Collecte</h3>
+          <p>Mesures de fréquentation, observations naturalistes, enquêtes et données partenaires.</p>
+        </article>
+        <article class="process-step">
+          <span>3</span>
+          <h3>Analyse</h3>
+          <p>Croisement des usages et des impacts pour identifier les points de tension prioritaires.</p>
+        </article>
+        <article class="process-step">
+          <span>4</span>
+          <h3>Décision</h3>
+          <p>Scénarios concrets d'aménagement, de régulation et de sensibilisation.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+    <!-- 4 - Pourquoi GEDEN ? -->
+   <section class="white home-highlights">
+    <div class="container">
+      <div class="section-head">
+        <h2>Pourquoi GeDEN ?</h2>
+        <p class="lead">Nous produisons des diagnostics directement exploitables pour piloter des espaces naturels vivants, sensibles et très fréquentés.</p>
+      </div>
+      <div class="highlights-grid">
+        <article class="highlight-card">
+          <p class="highlight-number">10+</p>
+          <h3>années d'expérience</h3>
+          <p>Un retour terrain consolidé sur la gestion des usages, en métropole comme en outre-mer.</p>
+        </article>
+        <article class="highlight-card">
+          <p class="highlight-number">3 axes</p>
+          <h3>pour décider mieux</h3>
+          <p>Fréquentation, pressions écologiques et perception sociale pour éclairer chaque arbitrage.</p>
+        </article>
+        <article class="highlight-card">
+          <p class="highlight-number">100%</p>
+          <h3>opérationnel</h3>
+          <p>Des livrables clairs, visuels et adaptés aux élus, gestionnaires, techniciens et partenaires.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+
+ <!-- 5 - Encarts de présentation - Résumés des pages  -->
+  <section class="gradient">
+    <div class="container cards">
+      <article class="card card--blue">
+        <h3>Présentation</h3>
+        <p>
+          Avec son réseau de partenaires scientifiques et techniques, GeDEN apporte des solutions
+          concrètes et rigoureuses pour suivre et évaluer les activités humaines dans les espaces naturels.
+        </p>
+        <a href="presentation.html" class="btn btn-dark mt-4">En savoir plus</a>
+      </article>
+
+      <article class="card card--orange">
+        <h3>Problématiques & Enjeux</h3>
+        <p>
+          Les pressions sur les socio-écosystèmes exigent des diagnostics fiables pour orienter
+          l’action publique : fréquentation, conflits d’usages, capacités de charge, adaptation.
+        </p>
+        <a href="problematiques-et-enjeux.html" class="btn btn-orange">En savoir plus</a>
+      </article>
+
+      <article class="card card--green">
+        <h3>Offres & Services</h3>
+        <p>
+          Études de fréquentation, enquêtes, suivis environnementaux, indicateurs et tableaux de bord :
+          une assistance scientifique et technique sur mesure.
+        </p>
+        <a href="offres-et-services.html" class="btn btn-primary">En savoir plus</a>
+      </article>
+
+      <article class="card">
+        <h3>Références</h3>
+        <p>
+          Plus de 10 ans d’expérience cumulée sur une diversité d’usages et d’écosystèmes. Des résultats
+          exploitables, livrés dans les formats adaptés à vos besoins.
+        </p>
+        <a href="references.html" class="btn btn-dark">Voir nos réalisations</a>
+      </article>
+    </div>
+  </section>
 
 <section class="white section-trust">
   <div class="container">
