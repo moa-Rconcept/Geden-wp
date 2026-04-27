@@ -13,10 +13,11 @@ get_header();
 $page_id = get_queried_object_id();
 $subtitle = has_excerpt($page_id) ? get_the_excerpt($page_id) : '';
 $terms = get_terms([
-    'taxonomy' => 'offre_category',
+    'taxonomy'   => 'offre_category',
     'hide_empty' => false,
-    'orderby' => 'name',
-    'order' => 'ASC',
+    'meta_key'   => '_geden_offre_order',
+    'orderby'    => 'meta_value_num',
+    'order'      => 'ASC'
 ]);
 
 $section_classes = [

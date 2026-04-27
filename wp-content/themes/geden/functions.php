@@ -810,6 +810,14 @@ function geden_offre_category_add_form_fields(): void
     <?php
 }
 add_action('offre_category_add_form_fields', 'geden_offre_category_add_form_fields');
+add_action('offre_category_add_form_fields', function () {
+?>
+<div class="form-field">
+    <label for="geden_offre_order">Ordre</label>
+    <input type="number" name="geden_offre_order" id="geden_offre_order" value="0">
+</div>
+<?php
+});
 
 function geden_offre_category_edit_form_fields(WP_Term $term): void
 {
@@ -864,6 +872,14 @@ function geden_offre_category_edit_form_fields(WP_Term $term): void
     <?php
 }
 add_action('offre_category_edit_form_fields', 'geden_offre_category_edit_form_fields');
+add_action('offre_category_add_form_fields', function () {
+?>
+<div class="form-field">
+    <label for="geden_offre_order">Ordre</label>
+    <input type="number" name="geden_offre_order" id="geden_offre_order" value="0">
+</div>
+<?php
+});
 
 function geden_save_offre_category_meta(int $term_id): void
 {
