@@ -153,12 +153,12 @@ $section_classes = [
               <?php the_content(); ?>
             <?php endif; ?>
           </article>
-        <?php elseif ($term->slug === 'outils-analytiques') : ?>
+        <!-- <?php elseif ($term->slug === 'outils-analytiques') : ?>
           <article class="tool">
             <h3 class="tool__title"><?php the_title(); ?></h3>
             <?php the_content(); ?>
           </article>
-        <?php else : ?>
+        <?php else : ?> -->
           <article class="service-content">
             <?php the_content(); ?>
           </article>
