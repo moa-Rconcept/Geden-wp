@@ -26,27 +26,31 @@
   sortCardsIn('encours');
 })();
 
-$(function () {
-  $('.pubs-acc').on('click', '.pubs-year__toggle', function () {
-    var $year = $(this).closest('.pubs-year');
-    var $panel = $year.find('.pubs-year__panel');
+jQuery(function ($) {
+  $('.pubs-acc')
+    .off('click.pubsAcc')
+    .on('click.pubsAcc', '.pubs-year__toggle', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
 
-    var $others = $year.siblings('.pubs-year.is-open');
-    $others.removeClass('is-open')
-      .find('.pubs-year__toggle').attr('aria-expanded', 'false').end()
-      .find('.pubs-year__panel').stop(true, true).slideUp(180);
+      var $toggle = $(this);
+      var $year = $toggle.closest('.pubs-year');
+      var $panel = $year.children('.pubs-year__panel');
 
-    var isOpen = $year.hasClass('is-open');
-    $year.toggleClass('is-open', !isOpen);
-    $(this).attr('aria-expanded', String(!isOpen));
-    $panel.stop(true, true).slideToggle(180);
-  });
+      var isOpen = $year.hasClass('is-open');
 
-  $('.pubs-year').each(function () {
-    var $p = $(this).find('.pubs-year__panel');
-    if ($p.is(':visible')) {
-      $(this).addClass('is-open')
-        .find('.pubs-year__toggle').attr('aria-expanded', 'true');
-    }
-  });
+      $year.siblings('.pubs-year.is-open')
+        .removeClass('is-open')
+        .children('.pubs-year__panel')
+        .stop(true, true)
+        .slideUp(180)
+        .end()
+        .find('.pubs-year__toggle')
+        .attr('aria-expanded', 'false');
+
+      $year.toggleClass('is-open', !isOpen);
+      $toggle.attr('aria-expanded', String(!isOpen));
+
+      $panel.stop(true, true);
+    });
 });
