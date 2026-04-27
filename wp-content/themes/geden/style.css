@@ -1249,6 +1249,7 @@ section.section.problematiques {
   border-top: 1px solid #eef2f7;
   padding-top: 10px;
   margin-top: 10px;
+  padding-bottom: 10px;
 }
 
 .pubs-year:first-child {
