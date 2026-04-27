@@ -875,6 +875,30 @@ function geden_save_offre_category_meta(int $term_id): void
 add_action('created_offre_category', 'geden_save_offre_category_meta');
 add_action('edited_offre_category', 'geden_save_offre_category_meta');
 
+
+add_filter('pre_term_description', 'geden_save_offre_category_description_html', 99);
+
+function geden_save_offre_category_description_html($description)
+{
+    $taxonomy = isset($_POST['taxonomy'])
+        ? sanitize_text_field(wp_unslash($_POST['taxonomy']))
+        : '';
+
+    if ($taxonomy !== 'offre_category') {
+        return $description;
+    }
+
+    if (!current_user_can('manage_categories')) {
+        return $description;
+    }
+
+    $raw_description = isset($_POST['description'])
+        ? (string) wp_unslash($_POST['description'])
+        : '';
+
+    return wp_kses_post($raw_description);
+}
+
 function geden_enable_rich_editor_for_offre_category_description(string $hook): void
 {
     if (!in_array($hook, ['edit-tags.php', 'term.php'], true)) {
