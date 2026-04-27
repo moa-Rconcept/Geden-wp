@@ -113,7 +113,7 @@ $section_classes = [
 
       <?php if (!$items->have_posts()) : ?>
         <?php if ($category_description !== '' && $term->slug !== 'blocs-offres' && $term->slug !== 'outils-analytiques') : ?>
-          <article class="service-content">
+          <article>
             <?php echo wp_kses_post(wpautop($category_description)); ?>
           </article>
         <?php else : ?>
