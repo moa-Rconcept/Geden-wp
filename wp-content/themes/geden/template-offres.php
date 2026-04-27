@@ -122,19 +122,18 @@ $section_classes = [
         <?php endif; ?>
       <?php endif; ?>
 
-      <?php
-      while ($items->have_posts()) : $items->the_post();
+      <?php while ($items->have_posts()) : $items->the_post();
         $post_id = get_the_ID();
+
+        $badge = (string) get_post_meta($post_id, '_geden_offre_badge', true);
+        $badge = $badge !== '' ? $badge : 'badge-blue';
+
+        $icon = (string) get_post_meta($post_id, '_geden_offre_icon', true);
+        $short_text = (string) get_post_meta($post_id, '_geden_offre_text', true);
+        $lines = geden_get_offre_lines($post_id);
       ?>
         <?php if ($term->slug === 'blocs-offres') : ?>
           <article class="services-card">
-            <?php
-            $badge = (string) get_post_meta($post_id, '_geden_offre_badge', true);
-            $badge = $badge !== '' ? $badge : 'badge-blue';
-            $icon = (string) get_post_meta($post_id, '_geden_offre_icon', true);
-            $short_text = (string) get_post_meta($post_id, '_geden_offre_text', true);
-            $lines = geden_get_offre_lines($post_id);
-            ?>
             <div class="services-card__head">
               <span class="services-icon icon-badge <?php echo esc_attr($badge); ?>" aria-hidden="true">
                 <span class="svg"><?php echo wp_kses(geden_get_enjeu_icon_svg($icon), ['svg' => ['viewBox' => true, 'fill' => true], 'path' => ['d' => true, 'stroke' => true, 'stroke-width' => true, 'stroke-linecap' => true, 'stroke-linejoin' => true], 'circle' => ['cx' => true, 'cy' => true, 'r' => true], 'rect' => ['x' => true, 'y' => true, 'width' => true, 'height' => true, 'rx' => true]]); ?></span>
@@ -156,10 +155,12 @@ $section_classes = [
         <?php elseif ($term->slug === 'outils-analytiques') : ?>
           <article class="tool">
             <h3 class="tool__title"><?php the_title(); ?></h3>
+
             <?php if (!empty($lines)) : ?>
               <ul class="en-list">
                 <?php foreach ($lines as $line) : ?>
-                  <li><?php echo esc_html($line); ?></li><?php endforeach; ?>
+                  <li><?php echo esc_html($line); ?></li>
+                <?php endforeach; ?>
               </ul>
             <?php elseif ($short_text !== '') : ?>
               <p><?php echo esc_html($short_text); ?></p>
