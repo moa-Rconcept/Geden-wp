@@ -153,12 +153,23 @@ $section_classes = [
               <?php the_content(); ?>
             <?php endif; ?>
           </article>
-        <!-- <?php elseif ($term->slug === 'outils-analytiques') : ?>
+        <?php elseif ($term->slug === 'outils-analytiques') : ?>
           <article class="tool">
             <h3 class="tool__title"><?php the_title(); ?></h3>
-            <?php the_content(); ?>
+            <?php if (!empty($lines)) : ?>
+              <ul class="en-list">
+                <?php foreach ($lines as $line) : ?>
+                  <li><?php echo esc_html($line); ?></li><?php endforeach; ?>
+              </ul>
+            <?php elseif ($short_text !== '') : ?>
+              <p><?php echo esc_html($short_text); ?></p>
+            <?php elseif (has_excerpt()) : ?>
+              <p><?php echo esc_html(get_the_excerpt()); ?></p>
+            <?php else : ?>
+              <?php the_content(); ?>
+            <?php endif; ?>
           </article>
-        <?php else : ?> -->
+        <?php else : ?>
           <article class="service-content">
             <?php the_content(); ?>
           </article>
