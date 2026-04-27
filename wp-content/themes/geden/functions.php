@@ -896,7 +896,14 @@ function geden_save_offre_category_description_html($description)
         ? (string) wp_unslash($_POST['description'])
         : '';
 
-    return wp_kses_post($raw_description);
+    $allowed_html = wp_kses_allowed_html('post');
+
+    foreach ($allowed_html as $tag => $attrs) {
+        $allowed_html[$tag]['class'] = true;
+        $allowed_html[$tag]['id'] = true;
+    }
+
+    return wp_kses($raw_description, $allowed_html);
 }
 
 function geden_enable_rich_editor_for_offre_category_description(string $hook): void
