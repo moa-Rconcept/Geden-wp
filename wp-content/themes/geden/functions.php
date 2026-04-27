@@ -786,6 +786,10 @@ function geden_offre_category_add_form_fields(): void
       <button type="button" class="button-link-delete" id="geden_clear_offre_category_image"><?php esc_html_e('Supprimer', 'geden'); ?></button>
       <p><?php esc_html_e('Utilisez la médiathèque WordPress.', 'geden'); ?></p>
     </div>
+    <div class="form-field">
+      <label for="geden_offre_order"><?php esc_html_e('Ordre', 'geden'); ?></label>
+      <input type="number" name="geden_offre_order" id="geden_offre_order" value="0" min="0" />
+    </div>
     <script>
       (function($){
         const idField = $('#geden_offre_category_image_id');
@@ -810,17 +814,10 @@ function geden_offre_category_add_form_fields(): void
     <?php
 }
 add_action('offre_category_add_form_fields', 'geden_offre_category_add_form_fields');
-add_action('offre_category_add_form_fields', function () {
-?>
-<div class="form-field">
-    <label for="geden_offre_order">Ordre</label>
-    <input type="number" name="geden_offre_order" id="geden_offre_order" value="0">
-</div>
-<?php
-});
 
 function geden_offre_category_edit_form_fields(WP_Term $term): void
 {
+    $order = (int) get_term_meta($term->term_id, '_geden_offre_order', true);
     $tag = (string) get_term_meta($term->term_id, '_geden_offre_category_tag', true);
     $title = (string) get_term_meta($term->term_id, '_geden_offre_category_title', true);
     $subtitle = (string) get_term_meta($term->term_id, '_geden_offre_category_subtitle', true);
@@ -848,6 +845,14 @@ function geden_offre_category_edit_form_fields(WP_Term $term): void
         <button type="button" class="button-link-delete" id="geden_clear_offre_category_image"><?php esc_html_e('Supprimer', 'geden'); ?></button>
       </td>
     </tr>
+    <tr class="form-field">
+      <th scope="row">
+        <label for="geden_offre_order"><?php esc_html_e('Ordre', 'geden'); ?></label>
+      </th>
+      <td>
+        <input type="number" name="geden_offre_order" id="geden_offre_order" value="<?php echo esc_attr((string) $order); ?>" min="0" />
+      </td>
+    </tr>
     <script>
       (function($){
         const idField = $('#geden_offre_category_image_id');
@@ -872,14 +877,6 @@ function geden_offre_category_edit_form_fields(WP_Term $term): void
     <?php
 }
 add_action('offre_category_edit_form_fields', 'geden_offre_category_edit_form_fields');
-add_action('offre_category_add_form_fields', function () {
-?>
-<div class="form-field">
-    <label for="geden_offre_order">Ordre</label>
-    <input type="number" name="geden_offre_order" id="geden_offre_order" value="0">
-</div>
-<?php
-});
 
 function geden_save_offre_category_meta(int $term_id): void
 {
@@ -887,6 +884,7 @@ function geden_save_offre_category_meta(int $term_id): void
     update_term_meta($term_id, '_geden_offre_category_title', sanitize_text_field((string) wp_unslash($_POST['geden_offre_category_title'] ?? '')));
     update_term_meta($term_id, '_geden_offre_category_subtitle', sanitize_textarea_field((string) wp_unslash($_POST['geden_offre_category_subtitle'] ?? '')));
     update_term_meta($term_id, '_geden_offre_category_image_id', absint($_POST['geden_offre_category_image_id'] ?? 0));
+    update_term_meta($term_id, '_geden_offre_order', absint($_POST['geden_offre_order'] ?? 0));
 }
 add_action('created_offre_category', 'geden_save_offre_category_meta');
 add_action('edited_offre_category', 'geden_save_offre_category_meta');
