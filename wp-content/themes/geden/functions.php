@@ -71,8 +71,8 @@ function geden_admin_enqueue_media_for_references(string $hook): void
         return;
     }
 
-     if (in_array($hook, ['post.php', 'post-new.php'], true) && $screen->post_type === 'geden_reference') {
-        wp_enqueue_media('jquery');
+    if (in_array($hook, ['post.php', 'post-new.php'], true) && in_array($screen->post_type, ['geden_reference', 'page'], true)) {
+        wp_enqueue_media();
         return;
     }
 
@@ -310,6 +310,7 @@ function geden_sponsor_meta_box(WP_Post $post): void
 function geden_references_page_options_meta_box(WP_Post $post): void
 {
     $template = (string) get_page_template_slug($post->ID);
+
     if ($template !== 'template-references.php') {
         echo '<p>' . esc_html__('Ce bloc est utilisé uniquement sur la page avec le template "Références (dynamique)".', 'geden') . '</p>';
         return;
@@ -318,31 +319,158 @@ function geden_references_page_options_meta_box(WP_Post $post): void
     wp_nonce_field('geden_save_references_page_options', 'geden_references_page_options_nonce');
 
     $banner_image_id = (int) get_post_meta($post->ID, '_geden_references_banner_image_id', true);
-    $hero_image_id = (int) get_post_meta($post->ID, '_geden_references_hero_image_id', true);
-    $hero_title = (string) get_post_meta($post->ID, '_geden_references_hero_title', true);
-    $hero_subtitle = (string) get_post_meta($post->ID, '_geden_references_hero_subtitle', true);
+    $hero_image_id   = (int) get_post_meta($post->ID, '_geden_references_hero_image_id', true);
+
+    $hero_title     = (string) get_post_meta($post->ID, '_geden_references_hero_title', true);
+    $hero_subtitle  = (string) get_post_meta($post->ID, '_geden_references_hero_subtitle', true);
     $hero_link_text = (string) get_post_meta($post->ID, '_geden_references_hero_link_text', true);
-    $hero_link_url = (string) get_post_meta($post->ID, '_geden_references_hero_link_url', true);
+    $hero_link_url  = (string) get_post_meta($post->ID, '_geden_references_hero_link_url', true);
+
+    $banner_image_url = $banner_image_id > 0 ? wp_get_attachment_image_url($banner_image_id, 'medium') : '';
+    $hero_image_url   = $hero_image_id > 0 ? wp_get_attachment_image_url($hero_image_id, 'medium') : '';
     ?>
-    <p><label for="geden_references_banner_image_id"><strong><?php esc_html_e('Image bandeau avant productions', 'geden'); ?></strong></label><br>
-      <input type="number" id="geden_references_banner_image_id" name="geden_references_banner_image_id" value="<?php echo esc_attr((string) $banner_image_id); ?>" min="0" style="width: 180px;" />
-      <small style="display:block;"><?php esc_html_e('Saisissez un ID de média WordPress.', 'geden'); ?></small>
+
+    <p>
+        <label><strong><?php esc_html_e('Image bandeau avant productions', 'geden'); ?></strong></label><br>
+
+        <input type="hidden"
+               id="geden_references_banner_image_id"
+               name="geden_references_banner_image_id"
+               value="<?php echo esc_attr((string) $banner_image_id); ?>">
+
+        <button type="button"
+                class="button geden-pick-page-image"
+                data-target="geden_references_banner_image_id"
+                data-preview="geden_references_banner_preview">
+            <?php esc_html_e('Choisir image', 'geden'); ?>
+        </button>
+
+        <button type="button"
+                class="button-link-delete geden-clear-page-image"
+                data-target="geden_references_banner_image_id"
+                data-preview="geden_references_banner_preview">
+            <?php esc_html_e('Supprimer', 'geden'); ?>
+        </button>
+
+        <br><br>
+
+        <img id="geden_references_banner_preview"
+             src="<?php echo esc_url((string) $banner_image_url); ?>"
+             style="max-width:220px;height:auto;<?php echo $banner_image_url ? '' : 'display:none;'; ?>">
     </p>
-    <p><label for="geden_references_hero_image_id"><strong><?php esc_html_e('Image hero productions', 'geden'); ?></strong></label><br>
-      <input type="number" id="geden_references_hero_image_id" name="geden_references_hero_image_id" value="<?php echo esc_attr((string) $hero_image_id); ?>" min="0" style="width: 180px;" />
+
+    <p>
+        <label><strong><?php esc_html_e('Image hero productions', 'geden'); ?></strong></label><br>
+
+        <input type="hidden"
+               id="geden_references_hero_image_id"
+               name="geden_references_hero_image_id"
+               value="<?php echo esc_attr((string) $hero_image_id); ?>">
+
+        <button type="button"
+                class="button geden-pick-page-image"
+                data-target="geden_references_hero_image_id"
+                data-preview="geden_references_hero_preview">
+            <?php esc_html_e('Choisir image', 'geden'); ?>
+        </button>
+
+        <button type="button"
+                class="button-link-delete geden-clear-page-image"
+                data-target="geden_references_hero_image_id"
+                data-preview="geden_references_hero_preview">
+            <?php esc_html_e('Supprimer', 'geden'); ?>
+        </button>
+
+        <br><br>
+
+        <img id="geden_references_hero_preview"
+             src="<?php echo esc_url((string) $hero_image_url); ?>"
+             style="max-width:220px;height:auto;<?php echo $hero_image_url ? '' : 'display:none;'; ?>">
     </p>
-    <p><label for="geden_references_hero_title"><strong><?php esc_html_e('Titre productions', 'geden'); ?></strong></label><br>
-      <input type="text" id="geden_references_hero_title" name="geden_references_hero_title" value="<?php echo esc_attr($hero_title); ?>" style="width: 100%;" />
+
+    <p>
+        <label for="geden_references_hero_title">
+            <strong><?php esc_html_e('Titre productions', 'geden'); ?></strong>
+        </label><br>
+        <input type="text"
+               id="geden_references_hero_title"
+               name="geden_references_hero_title"
+               value="<?php echo esc_attr($hero_title); ?>"
+               style="width:100%;">
     </p>
-    <p><label for="geden_references_hero_subtitle"><strong><?php esc_html_e('Sous-titre productions', 'geden'); ?></strong></label><br>
-      <input type="text" id="geden_references_hero_subtitle" name="geden_references_hero_subtitle" value="<?php echo esc_attr($hero_subtitle); ?>" style="width: 100%;" />
+
+    <p>
+        <label for="geden_references_hero_subtitle">
+            <strong><?php esc_html_e('Sous-titre productions', 'geden'); ?></strong>
+        </label><br>
+        <input type="text"
+               id="geden_references_hero_subtitle"
+               name="geden_references_hero_subtitle"
+               value="<?php echo esc_attr($hero_subtitle); ?>"
+               style="width:100%;">
     </p>
-    <p><label for="geden_references_hero_link_text"><strong><?php esc_html_e('Texte du lien (optionnel)', 'geden'); ?></strong></label><br>
-      <input type="text" id="geden_references_hero_link_text" name="geden_references_hero_link_text" value="<?php echo esc_attr($hero_link_text); ?>" style="width: 100%;" />
+
+    <p>
+        <label for="geden_references_hero_link_text">
+            <strong><?php esc_html_e('Texte du lien (optionnel)', 'geden'); ?></strong>
+        </label><br>
+        <input type="text"
+               id="geden_references_hero_link_text"
+               name="geden_references_hero_link_text"
+               value="<?php echo esc_attr($hero_link_text); ?>"
+               style="width:100%;">
     </p>
-    <p><label for="geden_references_hero_link_url"><strong><?php esc_html_e('URL du lien (optionnel)', 'geden'); ?></strong></label><br>
-      <input type="url" id="geden_references_hero_link_url" name="geden_references_hero_link_url" value="<?php echo esc_url($hero_link_url); ?>" style="width: 100%;" />
+
+    <p>
+        <label for="geden_references_hero_link_url">
+            <strong><?php esc_html_e('URL du lien (optionnel)', 'geden'); ?></strong>
+        </label><br>
+        <input type="url"
+               id="geden_references_hero_link_url"
+               name="geden_references_hero_link_url"
+               value="<?php echo esc_url($hero_link_url); ?>"
+               style="width:100%;">
     </p>
+
+    <script>
+        (function($){
+            $('.geden-pick-page-image').off('click').on('click', function(e){
+                e.preventDefault();
+
+                const button = $(this);
+                const target = $('#' + button.data('target'));
+                const preview = $('#' + button.data('preview'));
+
+                const frame = wp.media({
+                    title: 'Choisir une image',
+                    multiple: false,
+                    library: {
+                        type: 'image'
+                    }
+                });
+
+                frame.on('select', function(){
+                    const image = frame.state().get('selection').first().toJSON();
+                    const imageUrl = image.sizes && image.sizes.medium ? image.sizes.medium.url : image.url;
+
+                    target.val(image.id || 0);
+                    preview.attr('src', imageUrl).show();
+                });
+
+                frame.open();
+            });
+
+            $('.geden-clear-page-image').off('click').on('click', function(e){
+                e.preventDefault();
+
+                const button = $(this);
+
+                $('#' + button.data('target')).val(0);
+                $('#' + button.data('preview')).attr('src', '').hide();
+            });
+        })(jQuery);
+    </script>
+
     <?php
 }
 
